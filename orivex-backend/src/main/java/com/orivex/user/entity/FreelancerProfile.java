@@ -39,8 +39,8 @@ public class FreelancerProfile extends BaseEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal hourlyRate;
 
-    @Column(nullable = false, length = 100)
-    private String experience;
+    @Column(nullable = false)
+    private Integer experienceYears;
 
     @Column(length = 500)
     private String skills;

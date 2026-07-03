@@ -66,4 +66,10 @@ public class Project extends BaseEntity {
     @Column(nullable = false)
     private ProjectStatus status;
 
+    @Column(nullable = false, length = 1000)
+    private String requiredSkills;
+
+    @Column(nullable = false)
+    private Integer minimumExperienceYears;
+
 }
