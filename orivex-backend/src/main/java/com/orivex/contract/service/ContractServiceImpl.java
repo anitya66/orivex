@@ -3,7 +3,7 @@ package com.orivex.contract.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.orivex.chat.service.ConversationService;
 import org.springframework.stereotype.Service;
 
 import com.orivex.bid.entity.Bid;
@@ -41,6 +41,8 @@ public class ContractServiceImpl implements ContractService {
         private final ContractMapper contractMapper;
 
         private final NotificationHelper notificationHelper;
+
+        private final ConversationService conversationService;
 
         @Override
         public ApiResponse<List<ContractResponse>> getMyContracts() {
@@ -142,6 +144,8 @@ public class ContractServiceImpl implements ContractService {
                 .build();
 
         Contract savedContract = contractRepository.save(contract);
+
+        conversationService.createConversation(savedContract);
 
         notificationHelper.createNotification(
                 savedContract.getFreelancer().getUser(),
