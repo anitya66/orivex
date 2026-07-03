@@ -1,5 +1,7 @@
 package com.orivex.review.service;
 
+import com.orivex.notification.enums.NotificationType;
+import com.orivex.notification.helper.NotificationHelper;
 import java.util.List;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
@@ -40,69 +42,82 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ClientProfileRepository clientProfileRepository;
 
+    private final NotificationHelper notificationHelper;
+
     @Override
     public ApiResponse<ReviewResponse> createReview(
-            CreateReviewRequest request) {
+                    CreateReviewRequest request) {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+            User currentUser = authenticationFacade.getCurrentUser();
 
-        Contract contract = contractRepository
-                .findById(request.getContractId())
-                .orElseThrow(() -> new BadRequestException(
-                        "Contract not found."));
+            Contract contract = contractRepository
+                            .findById(request.getContractId())
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Contract not found."));
 
-        if (contract.getStatus() != ContractStatus.COMPLETED) {
+            if (contract.getStatus() != ContractStatus.COMPLETED) {
 
-            throw new BadRequestException(
-                    "Cannot review before contract completion.");
+                    throw new BadRequestException(
+                                    "Cannot review before contract completion.");
 
-        }
+            }
 
-        if (!contract.getClient().getUser().getId().equals(currentUser.getId())
-                && !contract.getFreelancer().getUser().getId()
-                        .equals(currentUser.getId())) {
+            if (!contract.getClient().getUser().getId().equals(currentUser.getId())
+                            && !contract.getFreelancer().getUser().getId()
+                                            .equals(currentUser.getId())) {
 
-            throw new BadRequestException(
-                    "You are not authorized to review this contract.");
+                    throw new BadRequestException(
+                                    "You are not authorized to review this contract.");
 
-        }
+            }
 
-        if (reviewRepository.existsByContractAndReviewer(
-                contract,
-                currentUser)) {
+            if (reviewRepository.existsByContractAndReviewer(
+                            contract,
+                            currentUser)) {
 
-            throw new BadRequestException(
-                    "You have already reviewed this contract.");
+                    throw new BadRequestException(
+                                    "You have already reviewed this contract.");
 
-        }
+            }
 
-        User reviewee;
+            User reviewee;
 
-        if (contract.getClient().getUser().getId()
-                .equals(currentUser.getId())) {
+            if (contract.getClient()
+                            .getUser()
+                            .getId()
+                            .equals(currentUser.getId())) {
 
-            reviewee = contract.getFreelancer().getUser();
+                    reviewee = contract.getFreelancer().getUser();
 
-        } else {
+            } else {
 
-            reviewee = contract.getClient().getUser();
+                    reviewee = contract.getClient().getUser();
 
-        }
+            }
 
-        Review review = Review.builder()
-                .contract(contract)
-                .reviewer(currentUser)
-                .reviewee(reviewee)
-                .rating(request.getRating())
-                .comment(request.getComment())
-                .createdAt(LocalDate.now())
-                .build();
+            Review review = Review.builder()
+                            .contract(contract)
+                            .reviewer(currentUser)
+                            .reviewee(reviewee)
+                            .rating(request.getRating())
+                            .comment(request.getComment())
+                            .createdAt(LocalDate.now())
+                            .build();
 
-        review = reviewRepository.save(review);
+            review = reviewRepository.save(review);
 
-        return ApiResponse.success(
-                reviewMapper.toResponse(review),
-                "Review created successfully.");
+            notificationHelper.createNotification(
+                            reviewee,
+                            NotificationType.REVIEW,
+                            "New Review Received",
+                            currentUser.getName()
+                                            + " has given you a "
+                                            + request.getRating()
+                                            + "-star review.");
+
+            return ApiResponse.success(
+                            reviewMapper.toResponse(review),
+                            "Review created successfully.");
 
     }
 

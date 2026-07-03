@@ -1,9 +1,9 @@
 package com.orivex.bid.service;
 
-import com.orivex.contract.service.ContractService;
 import java.util.List;
-import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.orivex.bid.dto.BidResponse;
 import com.orivex.bid.dto.CreateBidRequest;
@@ -14,6 +14,9 @@ import com.orivex.bid.mapper.BidMapper;
 import com.orivex.bid.repository.BidRepository;
 import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
+import com.orivex.contract.service.ContractService;
+import com.orivex.notification.enums.NotificationType;
+import com.orivex.notification.helper.NotificationHelper;
 import com.orivex.project.entity.Project;
 import com.orivex.project.enums.ProjectStatus;
 import com.orivex.project.repository.ProjectRepository;
@@ -28,119 +31,129 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
 
-    private final BidRepository bidRepository;
+        private final BidRepository bidRepository;
 
-    private final BidMapper bidMapper;
+        private final BidMapper bidMapper;
 
-    private final ProjectRepository projectRepository;
+        private final ProjectRepository projectRepository;
 
-    private final FreelancerProfileRepository freelancerProfileRepository;
+        private final FreelancerProfileRepository freelancerProfileRepository;
 
-    private final AuthenticationFacade authenticationFacade;
+        private final AuthenticationFacade authenticationFacade;
 
+        private final ContractService contractService;
 
-    private final ContractService contractService;
+        private final NotificationHelper notificationHelper;
 
-    @Override
-    public ApiResponse<BidResponse> createBid(
-            CreateBidRequest request) {
+        @Override
+        public ApiResponse<BidResponse> createBid(
+                        CreateBidRequest request) {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        FreelancerProfile freelancer = freelancerProfileRepository
-                .findByUser(currentUser)
-                .orElseThrow(() -> new BadRequestException(
-                        "Freelancer profile not found."));
+                FreelancerProfile freelancer = freelancerProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
 
-        Project project = projectRepository
-                .findById(request.getProjectId())
-                .orElseThrow(() -> new BadRequestException(
-                        "Project not found."));
+                Project project = projectRepository
+                                .findById(request.getProjectId())
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Project not found."));
 
-        if (project.getStatus() != ProjectStatus.OPEN) {
+                if (project.getStatus() != ProjectStatus.OPEN) {
 
-            throw new BadRequestException(
-                    "Project is not open for bidding.");
+                        throw new BadRequestException(
+                                        "Project is not open for bidding.");
+
+                }
+
+                if (project.getClient()
+                                .getUser()
+                                .getId()
+                                .equals(currentUser.getId())) {
+
+                        throw new BadRequestException(
+                                        "You cannot bid on your own project.");
+
+                }
+
+                if (bidRepository.existsByProjectAndFreelancer(
+                                project,
+                                freelancer)) {
+
+                        throw new BadRequestException(
+                                        "You have already placed a bid on this project.");
+
+                }
+
+                Bid bid = bidMapper.toEntity(request);
+
+                bid.setProject(project);
+
+                bid.setFreelancer(freelancer);
+
+                bid.setStatus(BidStatus.PENDING);
+
+                Bid savedBid = bidRepository.save(bid);
+
+                notificationHelper.createNotification(
+                                project.getClient().getUser(),
+                                NotificationType.BID,
+                                "New Bid Received",
+                                freelancer.getUser().getName()
+                                                + " submitted a bid for your project \""
+                                                + project.getTitle()
+                                                + "\".");
+
+                return ApiResponse.success(
+                                bidMapper.toResponse(savedBid),
+                                "Bid submitted successfully.");
 
         }
 
-        if (project.getClient()
-                .getUser()
-                .getId()
-                .equals(currentUser.getId())) {
+        @Override
+        public ApiResponse<List<BidResponse>> getMyBids() {
 
-            throw new BadRequestException(
-                    "You cannot bid on your own project.");
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                FreelancerProfile freelancer = freelancerProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
+
+                List<BidResponse> response = bidRepository
+                                .findByFreelancer(freelancer)
+                                .stream()
+                                .map(bidMapper::toResponse)
+                                .toList();
+
+                return ApiResponse.success(
+                                response,
+                                "Bids fetched successfully.");
 
         }
 
-        if (bidRepository.existsByProjectAndFreelancer(
-                project,
-                freelancer)) {
+        @Override
+        public ApiResponse<List<BidResponse>> getProjectBids(
+                        Long projectId) {
 
-            throw new BadRequestException(
-                    "You have already placed a bid on this project.");
+                Project project = projectRepository
+                                .findById(projectId)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Project not found."));
+
+                List<BidResponse> response = bidRepository
+                                .findByProject(project)
+                                .stream()
+                                .map(bidMapper::toResponse)
+                                .toList();
+
+                return ApiResponse.success(
+                                response,
+                                "Project bids fetched successfully.");
 
         }
-
-        Bid bid = bidMapper.toEntity(request);
-
-        bid.setProject(project);
-
-        bid.setFreelancer(freelancer);
-
-        bid.setStatus(BidStatus.PENDING);
-
-        Bid savedBid = bidRepository.save(bid);
-
-        return ApiResponse.success(
-                bidMapper.toResponse(savedBid),
-                "Bid submitted successfully.");
-
-    }
-
-    @Override
-    public ApiResponse<List<BidResponse>> getMyBids() {
-
-        User currentUser = authenticationFacade.getCurrentUser();
-
-        FreelancerProfile freelancer = freelancerProfileRepository
-                .findByUser(currentUser)
-                .orElseThrow(() -> new BadRequestException(
-                        "Freelancer profile not found."));
-
-        List<BidResponse> response = bidRepository
-                .findByFreelancer(freelancer)
-                .stream()
-                .map(bidMapper::toResponse)
-                .toList();
-
-        return ApiResponse.success(
-                response,
-                "Bids fetched successfully.");
-
-    }
-
-    @Override
-    public ApiResponse<List<BidResponse>> getProjectBids(
-            Long projectId) {
-
-        Project project = projectRepository
-                .findById(projectId)
-                .orElseThrow(() -> new BadRequestException(
-                        "Project not found."));
-
-        List<BidResponse> response = bidRepository
-                .findByProject(project)
-                .stream()
-                .map(bidMapper::toResponse)
-                .toList();
-
-        return ApiResponse.success(
-                response,
-                "Project bids fetched successfully.");
-
-    }
 
     @Override
     public ApiResponse<BidResponse> updateBid(
@@ -189,142 +202,170 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public ApiResponse<String> withdrawBid(
-            Long bidId) {
+                    Long bidId) {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+            User currentUser = authenticationFacade.getCurrentUser();
 
-        FreelancerProfile freelancer = freelancerProfileRepository
-                .findByUser(currentUser)
-                .orElseThrow(() -> new BadRequestException(
-                        "Freelancer profile not found."));
+            FreelancerProfile freelancer = freelancerProfileRepository
+                            .findByUser(currentUser)
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Freelancer profile not found."));
 
-        Bid bid = bidRepository.findById(bidId)
-                .orElseThrow(() -> new BadRequestException(
-                        "Bid not found."));
+            Bid bid = bidRepository.findById(bidId)
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Bid not found."));
 
-        if (!bid.getFreelancer().getId().equals(freelancer.getId())) {
+            if (!bid.getFreelancer().getId().equals(freelancer.getId())) {
 
-            throw new BadRequestException(
-                    "You can withdraw only your own bid.");
+                    throw new BadRequestException(
+                                    "You can withdraw only your own bid.");
 
-        }
+            }
 
-        if (bid.getStatus() != BidStatus.PENDING) {
+            if (bid.getStatus() != BidStatus.PENDING) {
 
-            throw new BadRequestException(
-                    "Only pending bids can be withdrawn.");
+                    throw new BadRequestException(
+                                    "Only pending bids can be withdrawn.");
 
-        }
+            }
 
-        bid.setStatus(BidStatus.WITHDRAWN);
+            bid.setStatus(BidStatus.WITHDRAWN);
 
-        bidRepository.save(bid);
+            bidRepository.save(bid);
 
-        return ApiResponse.success(
-                "Bid withdrawn successfully.");
+            return ApiResponse.success(
+                            "Bid withdrawn successfully.");
 
     }
 
     @Transactional
     @Override
-    public ApiResponse<String> acceptBid(Long bidId) {
+    public ApiResponse<String> acceptBid(
+                    Long bidId) {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+            User currentUser = authenticationFacade.getCurrentUser();
 
-        Bid acceptedBid = bidRepository.findById(bidId)
-                .orElseThrow(() -> new BadRequestException(
-                        "Bid not found."));
+            Bid acceptedBid = bidRepository.findById(bidId)
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Bid not found."));
 
-        if (!acceptedBid.getProject()
-                .getClient()
-                .getUser()
-                .getId()
-                .equals(currentUser.getId())) {
+            if (!acceptedBid.getProject()
+                            .getClient()
+                            .getUser()
+                            .getId()
+                            .equals(currentUser.getId())) {
 
-            throw new BadRequestException(
-                    "You can accept bids only for your own projects.");
-
-        }
-
-        if (acceptedBid.getStatus() != BidStatus.PENDING) {
-
-            throw new BadRequestException(
-                    "Only pending bids can be accepted.");
-
-        }
-
-        // Accept selected bid
-        acceptedBid.setStatus(BidStatus.ACCEPTED);
-
-        bidRepository.save(acceptedBid);
-
-        contractService.createContract(acceptedBid);
-
-        // Update Project Status
-        Project project = acceptedBid.getProject();
-
-        project.setStatus(ProjectStatus.IN_PROGRESS);
-
-        projectRepository.save(project);
-
-        // Reject all remaining pending bids
-        List<Bid> otherPendingBids = bidRepository.findByProjectAndStatus(
-                project,
-                BidStatus.PENDING);
-
-        for (Bid bid : otherPendingBids) {
-
-            if (!bid.getId().equals(acceptedBid.getId())) {
-
-                bid.setStatus(BidStatus.REJECTED);
-
-                bidRepository.save(bid);
+                    throw new BadRequestException(
+                                    "You can accept bids only for your own projects.");
 
             }
 
-        }
+            if (acceptedBid.getStatus() != BidStatus.PENDING) {
 
-        return ApiResponse.success(
-                "Bid accepted successfully.");
+                    throw new BadRequestException(
+                                    "Only pending bids can be accepted.");
+
+            }
+
+            // Accept selected bid
+            acceptedBid.setStatus(BidStatus.ACCEPTED);
+
+            bidRepository.save(acceptedBid);
+
+            // Notify accepted freelancer
+            notificationHelper.createNotification(
+                            acceptedBid.getFreelancer().getUser(),
+                            NotificationType.BID,
+                            "Bid Accepted",
+                            "Congratulations! Your bid for \""
+                                            + acceptedBid.getProject().getTitle()
+                                            + "\" has been accepted.");
+
+            // Create contract
+            contractService.createContract(acceptedBid);
+
+            // Update project status
+            Project project = acceptedBid.getProject();
+
+            project.setStatus(ProjectStatus.IN_PROGRESS);
+
+            projectRepository.save(project);
+
+            // Reject remaining pending bids
+            List<Bid> otherPendingBids = bidRepository
+                            .findByProjectAndStatus(
+                                            project,
+                                            BidStatus.PENDING);
+
+            for (Bid bid : otherPendingBids) {
+
+                    if (!bid.getId().equals(acceptedBid.getId())) {
+
+                            bid.setStatus(BidStatus.REJECTED);
+
+                            bidRepository.save(bid);
+
+                            notificationHelper.createNotification(
+                                            bid.getFreelancer().getUser(),
+                                            NotificationType.BID,
+                                            "Bid Rejected",
+                                            "Your bid for \""
+                                                            + project.getTitle()
+                                                            + "\" was not selected.");
+
+                    }
+
+            }
+
+            return ApiResponse.success(
+                            "Bid accepted successfully.");
 
     }
 
     @Override
     public ApiResponse<String> rejectBid(
-        Long bidId) {
+                    Long bidId) {
 
-    User currentUser = authenticationFacade.getCurrentUser();
+            User currentUser = authenticationFacade.getCurrentUser();
 
-    Bid bid = bidRepository.findById(bidId)
-            .orElseThrow(() ->
-                    new BadRequestException(
-                            "Bid not found."));
+            Bid bid = bidRepository.findById(bidId)
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Bid not found."));
 
-    if (!bid.getProject()
-            .getClient()
-            .getUser()
-            .getId()
-            .equals(currentUser.getId())) {
+            if (!bid.getProject()
+                            .getClient()
+                            .getUser()
+                            .getId()
+                            .equals(currentUser.getId())) {
 
-        throw new BadRequestException(
-                "You can reject bids only for your own projects.");
+                    throw new BadRequestException(
+                                    "You can reject bids only for your own projects.");
+
+            }
+
+            if (bid.getStatus() != BidStatus.PENDING) {
+
+                    throw new BadRequestException(
+                                    "Only pending bids can be rejected.");
+
+            }
+
+            bid.setStatus(BidStatus.REJECTED);
+
+            bidRepository.save(bid);
+
+            // Notify freelancer
+            notificationHelper.createNotification(
+                            bid.getFreelancer().getUser(),
+                            NotificationType.BID,
+                            "Bid Rejected",
+                            "Your bid for \""
+                                            + bid.getProject().getTitle()
+                                            + "\" has been rejected.");
+
+            return ApiResponse.success(
+                            "Bid rejected successfully.");
 
     }
-
-    if (bid.getStatus() != BidStatus.PENDING) {
-
-        throw new BadRequestException(
-                "Only pending bids can be rejected.");
-
-    }
-
-    bid.setStatus(BidStatus.REJECTED);
-
-    bidRepository.save(bid);
-
-    return ApiResponse.success(
-            "Bid rejected successfully.");
-
-   }
 
 }
