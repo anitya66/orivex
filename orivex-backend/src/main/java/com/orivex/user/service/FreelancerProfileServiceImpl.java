@@ -1,9 +1,12 @@
 package com.orivex.user.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
+import com.orivex.file.dto.FileUploadResponse;
+import com.orivex.file.service.FileService;
 import com.orivex.security.AuthenticationFacade;
 import com.orivex.user.dto.CreateFreelancerProfileRequest;
 import com.orivex.user.dto.FreelancerProfileResponse;
@@ -19,95 +22,164 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FreelancerProfileServiceImpl implements FreelancerProfileService {
 
-    private final FreelancerProfileRepository freelancerProfileRepository;
+        private final FreelancerProfileRepository freelancerProfileRepository;
 
-    private final FreelancerProfileMapper freelancerProfileMapper;
+        private final FreelancerProfileMapper freelancerProfileMapper;
 
-    private final AuthenticationFacade authenticationFacade;
+        private final AuthenticationFacade authenticationFacade;
 
-    @Override
-    public ApiResponse<FreelancerProfileResponse> createProfile(
-            CreateFreelancerProfileRequest request) {
+        private final FileService fileService;
 
-        User currentUser = authenticationFacade.getCurrentUser();
+        @Override
+        public ApiResponse<FreelancerProfileResponse> createProfile(
+                        CreateFreelancerProfileRequest request) {
 
-        if (freelancerProfileRepository.findByUser(currentUser).isPresent()) {
+                User currentUser = authenticationFacade.getCurrentUser();
 
-            throw new BadRequestException(
-                    "Freelancer profile already exists.");
+                if (freelancerProfileRepository.findByUser(currentUser).isPresent()) {
+
+                        throw new BadRequestException(
+                                        "Freelancer profile already exists.");
+
+                }
+
+                FreelancerProfile profile = freelancerProfileMapper.toEntity(request);
+
+                profile.setUser(currentUser);
+
+                FreelancerProfile savedProfile = freelancerProfileRepository.save(profile);
+
+                FreelancerProfileResponse response = freelancerProfileMapper.toResponse(savedProfile);
+
+                return ApiResponse.success(
+                                response,
+                                "Freelancer profile created successfully.");
 
         }
 
-        FreelancerProfile profile = freelancerProfileMapper.toEntity(request);
+        @Override
+        public ApiResponse<FreelancerProfileResponse> getMyProfile() {
 
-        profile.setUser(currentUser);
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        FreelancerProfile savedProfile = freelancerProfileRepository.save(profile);
+                FreelancerProfile profile = freelancerProfileRepository.findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
 
-        FreelancerProfileResponse response = freelancerProfileMapper.toResponse(savedProfile);
+                FreelancerProfileResponse response = freelancerProfileMapper.toResponse(profile);
 
-        return ApiResponse.success(
-                response,
-                "Freelancer profile created successfully.");
+                return ApiResponse.success(
+                                response,
+                                "Freelancer profile fetched successfully.");
 
-    }
+        }
 
-    @Override
-    public ApiResponse<FreelancerProfileResponse> getMyProfile() {
+        @Override
+        public ApiResponse<FreelancerProfileResponse> updateProfile(
+                        UpdateFreelancerProfileRequest request) {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        FreelancerProfile profile = freelancerProfileRepository.findByUser(currentUser)
-                .orElseThrow(() -> new BadRequestException(
-                        "Freelancer profile not found."));
+                FreelancerProfile profile = freelancerProfileRepository.findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
 
-        FreelancerProfileResponse response = freelancerProfileMapper.toResponse(profile);
+                freelancerProfileMapper.updateEntity(
+                                request,
+                                profile);
 
-        return ApiResponse.success(
-                response,
-                "Freelancer profile fetched successfully.");
+                FreelancerProfile updatedProfile = freelancerProfileRepository.save(profile);
 
-    }
+                FreelancerProfileResponse response = freelancerProfileMapper.toResponse(updatedProfile);
 
-    @Override
-    public ApiResponse<FreelancerProfileResponse> updateProfile(
-            UpdateFreelancerProfileRequest request) {
+                return ApiResponse.success(
+                                response,
+                                "Freelancer profile updated successfully.");
 
-        User currentUser = authenticationFacade.getCurrentUser();
+        }
 
-        FreelancerProfile profile = freelancerProfileRepository.findByUser(currentUser)
-                .orElseThrow(() -> new BadRequestException(
-                        "Freelancer profile not found."));
+        @Override
+        public ApiResponse<FreelancerProfileResponse> getProfileById(
+                        Long id) {
 
-        freelancerProfileMapper.updateEntity(
-                request,
-                profile);
+                FreelancerProfile profile = freelancerProfileRepository.findById(id)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
 
-        FreelancerProfile updatedProfile = freelancerProfileRepository.save(profile);
+                FreelancerProfileResponse response = freelancerProfileMapper.toResponse(profile);
 
-        FreelancerProfileResponse response = freelancerProfileMapper.toResponse(updatedProfile);
+                return ApiResponse.success(
+                                response,
+                                "Freelancer profile fetched successfully.");
 
-        return ApiResponse.success(
-                response,
-                "Freelancer profile updated successfully.");
+        }
 
-    }
+        @Override
+        public ApiResponse<String> uploadProfileImage(
+                        MultipartFile file) {
 
-    @Override
-    public ApiResponse<FreelancerProfileResponse> getProfileById(
-            Long id) {
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        FreelancerProfile profile = freelancerProfileRepository
-                .findById(id)
-                .orElseThrow(() -> new BadRequestException(
-                        "Freelancer profile not found."));
+                FreelancerProfile profile = freelancerProfileRepository.findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
 
-        FreelancerProfileResponse response = freelancerProfileMapper.toResponse(profile);
+                // Delete old profile image
+                if (profile.getProfileImage() != null &&
+                                !profile.getProfileImage().isBlank()) {
 
-        return ApiResponse.success(
-                response,
-                "Freelancer profile fetched successfully.");
+                        fileService.deleteFile(
+                                        profile.getProfileImage());
 
-    }
+                }
+
+                FileUploadResponse response = fileService.storeFile(
+                                file,
+                                "profile-images");
+
+                profile.setProfileImage(
+                                response.getFileDownloadUri());
+
+                freelancerProfileRepository.save(profile);
+
+                return ApiResponse.success(
+                                response.getFileDownloadUri(),
+                                "Profile image uploaded successfully.");
+
+        }
+
+        @Override
+        public ApiResponse<String> uploadResume(
+                        MultipartFile file) {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                FreelancerProfile profile = freelancerProfileRepository.findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
+
+                // Delete old resume
+                if (profile.getResumeUrl() != null &&
+                                !profile.getResumeUrl().isBlank()) {
+
+                        fileService.deleteFile(
+                                        profile.getResumeUrl());
+
+                }
+
+                FileUploadResponse response = fileService.storeFile(
+                                file,
+                                "resumes");
+
+                profile.setResumeUrl(
+                                response.getFileDownloadUri());
+
+                freelancerProfileRepository.save(profile);
+
+                return ApiResponse.success(
+                                response.getFileDownloadUri(),
+                                "Resume uploaded successfully.");
+
+        }
 
 }

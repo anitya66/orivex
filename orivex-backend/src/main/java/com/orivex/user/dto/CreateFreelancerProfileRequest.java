@@ -36,4 +36,6 @@ public class CreateFreelancerProfileRequest {
 
     private Boolean available;
 
+    private String resumeUrl;
+
 }

@@ -15,4 +15,6 @@ public interface FreelancerProfileRepository extends JpaRepository<FreelancerPro
 
     boolean existsByUser(User user);
 
+    
+
 }

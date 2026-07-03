@@ -1,9 +1,12 @@
 package com.orivex.user.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
+import com.orivex.file.dto.FileUploadResponse;
+import com.orivex.file.service.FileService;
 import com.orivex.security.AuthenticationFacade;
 import com.orivex.user.dto.ClientProfileResponse;
 import com.orivex.user.dto.CreateClientProfileRequest;
@@ -18,69 +21,105 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClientProfileServiceImpl implements ClientProfileService {
 
-    private final ClientProfileRepository clientProfileRepository;
+        private final ClientProfileRepository clientProfileRepository;
 
-    private final ClientProfileMapper clientProfileMapper;
+        private final ClientProfileMapper clientProfileMapper;
 
-    private final AuthenticationFacade authenticationFacade;
+        private final AuthenticationFacade authenticationFacade;
 
-    @Override
-    public ApiResponse<ClientProfileResponse> createProfile(
-            CreateClientProfileRequest request) {
+        private final FileService fileService;
 
-        User currentUser = authenticationFacade.getCurrentUser();
+        @Override
+        public ApiResponse<ClientProfileResponse> createProfile(
+                        CreateClientProfileRequest request) {
 
-        if (clientProfileRepository.findByUser(currentUser).isPresent()) {
+                User currentUser = authenticationFacade.getCurrentUser();
 
-            throw new BadRequestException(
-                    "Client profile already exists.");
+                if (clientProfileRepository.findByUser(currentUser).isPresent()) {
 
+                        throw new BadRequestException(
+                                        "Client profile already exists.");
+
+                }
+
+                ClientProfile profile = clientProfileMapper.toEntity(request);
+
+                profile.setUser(currentUser);
+
+                ClientProfile savedProfile = clientProfileRepository.save(profile);
+
+                ClientProfileResponse response = clientProfileMapper.toResponse(savedProfile);
+
+                return ApiResponse.success(
+                                response,
+                                "Client profile created successfully.");
         }
 
-        ClientProfile profile = clientProfileMapper.toEntity(request);
+        @Override
+        public ApiResponse<ClientProfileResponse> getMyProfile() {
 
-        profile.setUser(currentUser);
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        ClientProfile savedProfile = clientProfileRepository.save(profile);
+                ClientProfile profile = clientProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Client profile not found."));
 
-        ClientProfileResponse response = clientProfileMapper.toResponse(savedProfile);
+                ClientProfileResponse response = clientProfileMapper.toResponse(profile);
 
-        return ApiResponse.success(
-                response,
-                "Client profile created successfully.");
-    }
+                return ApiResponse.success(
+                                response,
+                                "Client profile fetched successfully.");
+        }
 
-    @Override
-    public ApiResponse<ClientProfileResponse> getMyProfile() {
+        @Override
+        public ApiResponse<ClientProfileResponse> getProfileById(
+                        Long id) {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+                ClientProfile profile = clientProfileRepository
+                                .findById(id)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Client profile not found."));
 
-        ClientProfile profile = clientProfileRepository
-                .findByUser(currentUser)
-                .orElseThrow(() -> new BadRequestException(
-                        "Client profile not found."));
+                ClientProfileResponse response = clientProfileMapper.toResponse(profile);
 
-        ClientProfileResponse response = clientProfileMapper.toResponse(profile);
+                return ApiResponse.success(
+                                response,
+                                "Client profile fetched successfully.");
+        }
 
-        return ApiResponse.success(
-                response,
-                "Client profile fetched successfully.");
-    }
+        @Override
+        public ApiResponse<String> uploadCompanyLogo(
+                        MultipartFile file) {
 
-    @Override
-    public ApiResponse<ClientProfileResponse> getProfileById(
-            Long id) {
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        ClientProfile profile = clientProfileRepository
-                .findById(id)
-                .orElseThrow(() -> new BadRequestException(
-                        "Client profile not found."));
+                ClientProfile profile = clientProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Client profile not found."));
 
-        ClientProfileResponse response = clientProfileMapper.toResponse(profile);
+                // Delete old logo if it exists
+                if (profile.getCompanyLogo() != null &&
+                                !profile.getCompanyLogo().isBlank()) {
 
-        return ApiResponse.success(
-                response,
-                "Client profile fetched successfully.");
-    }
+                        fileService.deleteFile(
+                                        profile.getCompanyLogo());
+
+                }
+
+                FileUploadResponse response = fileService.storeFile(
+                                file,
+                                "company-logos");
+
+                profile.setCompanyLogo(
+                                response.getFileDownloadUri());
+
+                clientProfileRepository.save(profile);
+
+                return ApiResponse.success(
+                                response.getFileDownloadUri(),
+                                "Company logo uploaded successfully.");
+        }
 
 }

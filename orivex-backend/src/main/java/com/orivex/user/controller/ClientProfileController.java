@@ -2,7 +2,8 @@ package com.orivex.user.controller;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.user.dto.ClientProfileResponse;
 import com.orivex.user.dto.CreateClientProfileRequest;
@@ -41,5 +42,16 @@ public class ClientProfileController {
         return clientProfileService.getProfileById(id);
 
     }
+
+    @PostMapping(
+        value = "/company-logo",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> uploadCompanyLogo(
+        @RequestPart("file") MultipartFile file) {
+
+    return clientProfileService.uploadCompanyLogo(file);
+
+}
+
 
 }

@@ -1,4 +1,4 @@
-
+package com.orivex.ai.enums;
 
 public enum RecommendationLevel {
 

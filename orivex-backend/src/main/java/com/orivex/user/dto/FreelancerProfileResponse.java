@@ -35,4 +35,8 @@ public class FreelancerProfileResponse {
 
     private Boolean available;
 
+    
+
+    private String resumeUrl;
+
 }

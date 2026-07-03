@@ -30,6 +30,8 @@ public interface ProjectRepository
 
     Page<Project> findByTitleContainingIgnoreCase(
             String keyword,
-            Pageable pageable);        
+                    Pageable pageable);
+            
+    long countByStatus(ProjectStatus status);                
 
         }

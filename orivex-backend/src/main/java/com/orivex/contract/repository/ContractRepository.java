@@ -19,6 +19,12 @@ public interface ContractRepository
             ClientProfile client);
 
     boolean existsByBid(
-            Bid bid);
+                    Bid bid);
+   
+    long countByFreelancer(
+                    FreelancerProfile freelancer);
+
+    long countByClient(
+                    ClientProfile client);                
 
 }

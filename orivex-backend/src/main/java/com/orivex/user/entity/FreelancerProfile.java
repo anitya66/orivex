@@ -57,6 +57,9 @@ public class FreelancerProfile extends BaseEntity {
     @Column(length = 500)
     private String profileImage;
 
+    @Column(length = 500)
+    private String resumeUrl;
+
     @Column(nullable = false)
     private Boolean available;
 

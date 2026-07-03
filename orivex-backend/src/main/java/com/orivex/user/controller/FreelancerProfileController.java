@@ -2,7 +2,8 @@ package com.orivex.user.controller;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.user.dto.CreateFreelancerProfileRequest;
 import com.orivex.user.dto.FreelancerProfileResponse;
@@ -50,5 +51,26 @@ public class FreelancerProfileController {
         return freelancerProfileService.getProfileById(id);
 
     }
+
+    @PostMapping(
+        value = "/profile-image",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ApiResponse<String> uploadProfileImage(
+        @RequestPart("file") MultipartFile file) {
+
+    return freelancerProfileService
+            .uploadProfileImage(file);
+
+}
+
+@PostMapping(value = "/resume", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ApiResponse<String> uploadResume(
+        @RequestPart("file") MultipartFile file) {
+
+    return freelancerProfileService
+            .uploadResume(file);
+
+}
+
 
 }

@@ -30,4 +30,6 @@ public interface FreelancerProfileMapper {
             UpdateFreelancerProfileRequest request,
             @MappingTarget FreelancerProfile profile);
 
+            
+
 }

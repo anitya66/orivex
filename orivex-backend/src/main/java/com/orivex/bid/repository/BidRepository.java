@@ -21,6 +21,11 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
      
     List<Bid> findByProjectAndStatus(
         Project project,
-        BidStatus status);        
+                    BidStatus status);
 
+     long countByFreelancer(FreelancerProfile freelancer);
+
+    long countByFreelancerAndStatus(
+                    FreelancerProfile freelancer,
+                    BidStatus status);               
 }
