@@ -5,7 +5,11 @@ import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.orivex.auth.dto.CurrentUserResponse;
+import com.orivex.user.entity.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import com.orivex.auth.dto.LoginRequest;
 import com.orivex.auth.dto.LoginResponse;
@@ -14,8 +18,14 @@ import com.orivex.auth.mapper.AuthMapper;
 import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.security.JwtService;
-import com.orivex.user.entity.User;
+
 import com.orivex.user.enums.AccountStatus;
+
+
+
+
+import com.orivex.security.CustomUserDetails;
+
 import com.orivex.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -104,4 +114,24 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
+    @Override
+    public ApiResponse<CurrentUserResponse> getCurrentUser() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        User user = userDetails.getUser();
+
+        CurrentUserResponse response = CurrentUserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+
+        return ApiResponse.success(
+                response,
+                "User fetched successfully.");
+    }
 }
