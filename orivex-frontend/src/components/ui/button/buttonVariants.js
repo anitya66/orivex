@@ -12,7 +12,7 @@ export const buttonVariants = cva(
           "bg-slate-800 text-white hover:bg-slate-700",
 
         outline:
-          "border border-slate-700 bg-transparent hover:bg-slate-800",
+          "border border-slate-700 bg-transparent text-white hover:bg-slate-800",
 
         destructive:
           "bg-red-600 text-white hover:bg-red-700",

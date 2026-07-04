@@ -6,7 +6,7 @@ import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
-import HomePage from "@/features/home/pages/HomePage";
+import LandingPage from "@/features/landing/pages/LandingPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
@@ -17,7 +17,7 @@ function AppRouter() {
     <Routes>
 
       <Route element={<MainLayout />}>
-        <Route path={ROUTES.HOME} element={<HomePage />} />
+        <Route path={ROUTES.HOME} element={<LandingPage />} />
       </Route>
 
       <Route element={<AuthLayout />}>
