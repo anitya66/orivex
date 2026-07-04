@@ -22,7 +22,9 @@ export function AuthProvider({ children }) {
 
       const token = localStorage.getItem(
         STORAGE_KEYS.ACCESS_TOKEN
-      );
+        );
+        
+      console.log("TOKEN:", token);  
 
       if (!token) {
         setLoading(false);
@@ -33,7 +35,9 @@ export function AuthProvider({ children }) {
 
         const response = await getCurrentUser();
 
-        setUser(response.data.data);
+          setUser(response.data);
+          console.log("USER:", response.data);
+          
 
       } catch (error) {
 

@@ -1,7 +1,13 @@
 function DashboardPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center text-5xl font-bold">
-      Dashboard
+    <div>
+      <h2 className="text-3xl font-bold">
+        Welcome to Dashboard 🚀
+      </h2>
+
+      <p className="mt-4 text-slate-400">
+        Authentication is working successfully.
+      </p>
     </div>
   );
 }

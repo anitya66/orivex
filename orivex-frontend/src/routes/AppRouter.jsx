@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import { ROUTES } from "@/constants/routes";
-
+import ProtectedRoute from "./ProtectedRoute";
 import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -25,9 +25,17 @@ function AppRouter() {
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
       </Route>
 
-      <Route element={<DashboardLayout />}>
-        <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+      <Route
+  path={ROUTES.DASHBOARD}
+  element={
+    <ProtectedRoute>
+      <DashboardLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route index element={<DashboardPage />} />
       </Route>
+      
 
       <Route path="*" element={<NotFoundPage />} />
 

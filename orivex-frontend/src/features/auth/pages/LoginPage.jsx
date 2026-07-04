@@ -1,14 +1,25 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { login } from "../services/authService";
+
+import {
+  login,
+  getCurrentUser,
+} from "../services/authService";
+
 import { STORAGE_KEYS } from "@/constants/storageKeys";
 import { loginSchema } from "../validation/loginSchema";
 import { useAuth } from "@/contexts/AuthContext";
 
 function LoginPage() {
+  const navigate = useNavigate();
+
+  const { setUser } = useAuth();
+
   const {
     register,
     handleSubmit,
@@ -16,38 +27,40 @@ function LoginPage() {
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
-    
-    const { setUser } = useAuth();
 
   const onSubmit = async (data) => {
-  try {
-    const response = await login(data);
+    try {
+      // Login API
+      const response = await login(data);
 
-    localStorage.setItem(
-      STORAGE_KEYS.ACCESS_TOKEN,
-      response.data.accessToken
-    );
+      // Save JWT
+      localStorage.setItem(
+        STORAGE_KEYS.ACCESS_TOKEN,
+        response.data.accessToken
+      );
 
-    console.log(response);
+      // Fetch logged-in user
+      const currentUser = await getCurrentUser();
 
-    setUser(response.data.data);
+      // Save user in AuthContext
+      setUser(currentUser.data);
 
       toast.success("Login Successful");
-      
-  } catch (error) {
-    console.error(error);
 
-    toast.error(
-  error.response?.data?.message || "Login Failed"
+      // Redirect
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        error.response?.data?.message || "Login Failed"
       );
-      
-  }
-};
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-6">
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8">
-
         <h1 className="text-3xl font-bold text-white">
           Welcome Back
         </h1>
