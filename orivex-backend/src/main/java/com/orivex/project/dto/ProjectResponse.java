@@ -2,6 +2,7 @@ package com.orivex.project.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.orivex.project.enums.ExperienceLevel;
 import com.orivex.project.enums.ProjectCategory;
@@ -36,5 +37,17 @@ public class ProjectResponse {
     private LocalDate deadline;
 
     private ProjectStatus status;
+
+    // =========================
+    // NEW FIELDS
+    // =========================
+
+    private String requiredSkills;
+
+    private Integer minimumExperienceYears;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
 }

@@ -2,11 +2,12 @@ package com.orivex.project.service;
 
 import java.util.List;
 
-
+import com.orivex.project.dto.UpdateProjectRequest;
 import com.orivex.common.dto.PagedResponse;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.project.dto.CreateProjectRequest;
 import com.orivex.project.dto.ProjectResponse;
+import com.orivex.project.dto.UpdateProjectRequest;
 import com.orivex.project.enums.ProjectStatus;
 
 public interface ProjectService {
@@ -33,6 +34,11 @@ public interface ProjectService {
                     int page,
                     int size,
                     String sortBy,
-                    String direction);                
+                    String direction);
 
+     ApiResponse<ProjectResponse> updateProject(
+        Long id,
+                     UpdateProjectRequest request);
+        
+     ApiResponse<Void> deleteProject(Long id);                
 }

@@ -15,6 +15,7 @@ import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.project.dto.CreateProjectRequest;
 import com.orivex.project.dto.ProjectResponse;
+import com.orivex.project.dto.UpdateProjectRequest;
 import com.orivex.project.entity.Project;
 import com.orivex.project.enums.ProjectStatus;
 import com.orivex.project.mapper.ProjectMapper;
@@ -59,8 +60,20 @@ public class ProjectServiceImpl implements ProjectService {
             Project project = projectMapper.toEntity(request);
 
             project.setClient(client);
+            project.setStatus(ProjectStatus.OPEN);
 
-            logger.info("Saving project with title: {}", request.getTitle());
+            logger.info("=================================================");
+            logger.info("Title                : {}", project.getTitle());
+            logger.info("Description          : {}", project.getDescription());
+            logger.info("Category             : {}", project.getCategory());
+            logger.info("Project Type         : {}", project.getProjectType());
+            logger.info("Experience Level     : {}", project.getExperienceLevel());
+            logger.info("Budget               : {}", project.getBudget());
+            logger.info("Deadline             : {}", project.getDeadline());
+            logger.info("Required Skills      : {}", project.getRequiredSkills());
+            logger.info("Minimum Experience   : {}", project.getMinimumExperienceYears());
+            logger.info("Status               : {}", project.getStatus());
+            logger.info("=================================================");
 
             Project savedProject = projectRepository.save(project);
 
@@ -216,5 +229,69 @@ public class ProjectServiceImpl implements ProjectService {
                             "Projects fetched successfully.");
 
     }
+
+    @Override
+public ApiResponse<ProjectResponse> updateProject(
+        Long id,
+                UpdateProjectRequest request) {
+
+        User currentUser = authenticationFacade.getCurrentUser();
+
+        ClientProfile client = clientProfileRepository
+                        .findByUser(currentUser)
+                        .orElseThrow(() -> new BadRequestException("Client profile not found."));
+
+        Project project = projectRepository
+                        .findById(id)
+                        .orElseThrow(() -> new BadRequestException("Project not found."));
+
+        if (!project.getClient().getId().equals(client.getId())) {
+                throw new BadRequestException(
+                                "You are not allowed to update this project.");
+        }
+
+        project.setTitle(request.getTitle());
+        project.setDescription(request.getDescription());
+        project.setCategory(request.getCategory());
+        project.setProjectType(request.getProjectType());
+        project.setExperienceLevel(request.getExperienceLevel());
+        project.setBudget(request.getBudget());
+        project.setDeadline(request.getDeadline());
+        project.setRequiredSkills(request.getRequiredSkills());
+        project.setMinimumExperienceYears(
+                        request.getMinimumExperienceYears());
+
+        Project updatedProject = projectRepository.save(project);
+
+        return ApiResponse.success(
+                        projectMapper.toResponse(updatedProject),
+                        "Project updated successfully.");
+}
+
+@Override
+public ApiResponse<Void> deleteProject(Long id) {
+
+        User currentUser = authenticationFacade.getCurrentUser();
+
+        ClientProfile client = clientProfileRepository
+                        .findByUser(currentUser)
+                        .orElseThrow(() -> new BadRequestException("Client profile not found."));
+
+        Project project = projectRepository
+                        .findById(id)
+                        .orElseThrow(() -> new BadRequestException("Project not found."));
+
+        if (!project.getClient().getId().equals(client.getId())) {
+                throw new BadRequestException(
+                                "You are not allowed to delete this project.");
+        }
+
+        projectRepository.delete(project);
+
+        return ApiResponse.success(
+                        null,
+                        "Project deleted successfully.");
+}
+
 
 }

@@ -16,7 +16,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class CreateProjectRequest {
+public class UpdateProjectRequest {
 
     @NotBlank(message = "Title is required.")
     @Size(max = 200)
@@ -44,12 +44,11 @@ public class CreateProjectRequest {
     private LocalDate deadline;
 
     @NotBlank(message = "Required skills are required.")
-@Size(max = 1000)
-private String requiredSkills;
+    @Size(max = 1000)
+    private String requiredSkills;
 
-@NotNull(message = "Minimum experience is required.")
-@Min(value = 0, message = "Minimum experience cannot be negative.")
-private Integer minimumExperienceYears;
-
+    @NotNull(message = "Minimum experience is required.")
+    @Min(value = 0, message = "Minimum experience cannot be negative.")
+    private Integer minimumExperienceYears;
 
 }
