@@ -1,15 +1,20 @@
 import { Outlet } from "react-router-dom";
 
+import Sidebar from "@/components/common/Sidebar/Sidebar";
+import Topbar from "@/components/common/Topbar/Topbar";
+
 function DashboardLayout() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="border-b border-slate-800 p-4">
-        <h1 className="text-xl font-bold">ORIVEX Dashboard</h1>
-      </header>
+    <div className="flex min-h-screen bg-slate-950">
+      <Sidebar />
 
-      <main className="p-6">
-        <Outlet />
-      </main>
+      <div className="flex flex-1 flex-col">
+        <Topbar />
+
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
