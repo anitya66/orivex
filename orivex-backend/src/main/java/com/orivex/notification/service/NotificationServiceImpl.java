@@ -9,6 +9,7 @@ import com.orivex.common.response.ApiResponse;
 import com.orivex.notification.dto.NotificationResponse;
 import com.orivex.notification.entity.Notification;
 import com.orivex.notification.enums.NotificationStatus;
+import com.orivex.notification.enums.NotificationType;
 import com.orivex.notification.mapper.NotificationMapper;
 import com.orivex.notification.repository.NotificationRepository;
 import com.orivex.security.AuthenticationFacade;
@@ -20,89 +21,101 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
-    private final NotificationRepository notificationRepository;
+        private final NotificationRepository notificationRepository;
 
-    private final NotificationMapper notificationMapper;
+        private final NotificationMapper notificationMapper;
 
-    private final AuthenticationFacade authenticationFacade;
+        private final AuthenticationFacade authenticationFacade;
 
-    @Override
-    public ApiResponse<List<NotificationResponse>> getMyNotifications() {
+        @Override
+        public ApiResponse<List<NotificationResponse>> getMyNotifications() {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        List<NotificationResponse> response = notificationRepository
-                .findByUserOrderByCreatedAtDesc(currentUser)
-                .stream()
-                .map(notificationMapper::toResponse)
-                .toList();
+                List<NotificationResponse> response = notificationRepository
+                                .findByUserOrderByCreatedAtDesc(currentUser)
+                                .stream()
+                                .map(notificationMapper::toResponse)
+                                .toList();
 
-        return ApiResponse.success(
-                response,
-                "Notifications fetched successfully.");
-
-    }
-
-    @Override
-    public ApiResponse<Long> getUnreadCount() {
-
-        User currentUser = authenticationFacade.getCurrentUser();
-
-        long unreadCount = notificationRepository
-                .countByUserAndStatus(
-                        currentUser,
-                        NotificationStatus.UNREAD);
-
-        return ApiResponse.success(
-                unreadCount,
-                "Unread notification count fetched successfully.");
-
-    }
-
-    @Override
-    public ApiResponse<String> markAsRead(
-            Long notificationId) {
-
-        User currentUser = authenticationFacade.getCurrentUser();
-
-        Notification notification = notificationRepository
-                .findById(notificationId)
-                .orElseThrow(() -> new BadRequestException(
-                        "Notification not found."));
-
-        if (!notification.getUser().getId().equals(currentUser.getId())) {
-
-            throw new BadRequestException(
-                    "You are not allowed to access this notification.");
-
+                return ApiResponse.success(
+                                response,
+                                "Notifications fetched successfully.");
         }
 
-        notification.setStatus(NotificationStatus.READ);
+        @Override
+        public ApiResponse<Long> getUnreadCount() {
 
-        notificationRepository.save(notification);
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        return ApiResponse.success(
-                "Notification marked as read.");
+                long unreadCount = notificationRepository
+                                .countByUserAndStatus(
+                                                currentUser,
+                                                NotificationStatus.UNREAD);
 
-    }
+                return ApiResponse.success(
+                                unreadCount,
+                                "Unread notification count fetched successfully.");
+        }
 
-    @Override
-    public ApiResponse<String> markAllAsRead() {
+        @Override
+        public ApiResponse<String> markAsRead(Long notificationId) {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+                User currentUser = authenticationFacade.getCurrentUser();
 
-        List<Notification> notifications = notificationRepository
-                .findByUserAndStatusOrderByCreatedAtDesc(
-                        currentUser,
-                        NotificationStatus.UNREAD);
+                Notification notification = notificationRepository
+                                .findById(notificationId)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Notification not found."));
 
-        notifications.forEach(notification -> notification.setStatus(NotificationStatus.READ));
+                if (!notification.getUser().getId().equals(currentUser.getId())) {
 
-        notificationRepository.saveAll(notifications);
+                        throw new BadRequestException(
+                                        "You are not allowed to access this notification.");
+                }
 
-        return ApiResponse.success(
-                "All notifications marked as read.");
+                notification.setStatus(NotificationStatus.READ);
 
-    }
+                notificationRepository.save(notification);
+
+                return ApiResponse.success(
+                                "Notification marked as read.");
+        }
+
+        @Override
+        public ApiResponse<String> markAllAsRead() {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                List<Notification> notifications = notificationRepository
+                                .findByUserAndStatusOrderByCreatedAtDesc(
+                                                currentUser,
+                                                NotificationStatus.UNREAD);
+
+                notifications.forEach(notification -> notification.setStatus(NotificationStatus.READ));
+
+                notificationRepository.saveAll(notifications);
+
+                return ApiResponse.success(
+                                "All notifications marked as read.");
+        }
+
+        @Override
+        public void createNotification(
+                        User user,
+                        NotificationType type,
+                        String title,
+                        String message) {
+
+                Notification notification = Notification.builder()
+                                .user(user)
+                                .type(type)
+                                .title(title)
+                                .message(message)
+                                .status(NotificationStatus.UNREAD)
+                                .build();
+
+                notificationRepository.save(notification);
+        }
 
 }

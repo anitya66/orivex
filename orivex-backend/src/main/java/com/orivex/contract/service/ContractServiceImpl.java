@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import com.orivex.chat.service.ConversationService;
 import org.springframework.stereotype.Service;
 
-import com.orivex.bid.entity.Bid;
+import com.orivex.proposal.entity.Proposal;
 import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.contract.dto.ContractResponse;
@@ -124,46 +124,45 @@ public class ContractServiceImpl implements ContractService {
         }
 
     @Override
-    public void createContract(Bid acceptedBid) {
+public void createContract(Proposal acceptedProposal) {
 
-        if (contractRepository.existsByBid(acceptedBid)) {
+    if (contractRepository.existsByProposal(acceptedProposal)) {
 
-            throw new BadRequestException(
-                    "Contract already exists for this bid.");
-
-        }
-
-        Contract contract = Contract.builder()
-                .project(acceptedBid.getProject())
-                .client(acceptedBid.getProject().getClient())
-                .freelancer(acceptedBid.getFreelancer())
-                .bid(acceptedBid)
-                .agreedBudget(acceptedBid.getProposedBudget())
-                .deadline(acceptedBid.getProject().getDeadline())
-                .status(ContractStatus.PENDING)
-                .build();
-
-        Contract savedContract = contractRepository.save(contract);
-
-        conversationService.createConversation(savedContract);
-
-        notificationHelper.createNotification(
-                savedContract.getFreelancer().getUser(),
-                NotificationType.CONTRACT,
-                "New Contract",
-                "A new contract has been created for project \""
-                        + savedContract.getProject().getTitle()
-                        + "\".");
-
-        notificationHelper.createNotification(
-                savedContract.getClient().getUser(),
-                NotificationType.CONTRACT,
-                "Contract Created",
-                "Contract for project \""
-                        + savedContract.getProject().getTitle()
-                        + "\" has been created successfully.");
-
+        throw new BadRequestException(
+                "Contract already exists for this proposal.");
     }
+
+    Contract contract = Contract.builder()
+            .project(acceptedProposal.getProject())
+            .client(acceptedProposal.getProject().getClient())
+            .freelancer(acceptedProposal.getFreelancer())
+            .proposal(acceptedProposal)
+            .agreedBudget(acceptedProposal.getProposedBudget())
+            .deadline(acceptedProposal.getProject().getDeadline())
+            .status(ContractStatus.PENDING)
+            .build();
+
+    Contract savedContract = contractRepository.save(contract);
+
+    conversationService.createConversation(savedContract);
+
+    notificationHelper.createNotification(
+            savedContract.getFreelancer().getUser(),
+            NotificationType.CONTRACT,
+            "New Contract",
+            "A new contract has been created for project \""
+                    + savedContract.getProject().getTitle()
+                    + "\".");
+
+    notificationHelper.createNotification(
+            savedContract.getClient().getUser(),
+            NotificationType.CONTRACT,
+            "Contract Created",
+            "Contract for project \""
+        + savedContract.getProject().getTitle()
+        + "\" has been created successfully.");
+}
+
 
     @Override
     public ApiResponse<String> startContract(

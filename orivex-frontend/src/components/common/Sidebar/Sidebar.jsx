@@ -27,23 +27,23 @@ const clientMenus = [
     icon: Briefcase,
   },
   {
+    name: "Contracts",
+    path: "/dashboard/contracts",
+    icon: FileText,
+  },
+  {
     name: "Bids",
     path: "/bids",
     icon: Gavel,
   },
   {
-    name: "Contracts",
-    path: "/contracts",
-    icon: FileText,
-  },
-  {
     name: "Chat",
-    path: "/chat",
+    path: "/dashboard/chat",
     icon: MessageSquare,
   },
   {
     name: "Notifications",
-    path: "/notifications",
+    path: "/dashboard/notifications",
     icon: Bell,
   },
   {
@@ -75,18 +75,18 @@ const freelancerMenus = [
     icon: Gavel,
   },
   {
-    name: "Contracts",
-    path: "/contracts",
+    name: "My Contracts",
+    path: "/dashboard/my-contracts",
     icon: FileText,
   },
   {
     name: "Chat",
-    path: "/chat",
+    path: "/dashboard/chat",
     icon: MessageSquare,
   },
   {
     name: "Notifications",
-    path: "/notifications",
+    path: "/dashboard/notifications",
     icon: Bell,
   },
   {
@@ -104,10 +104,11 @@ const freelancerMenus = [
 function Sidebar() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
+
   const menus =
-  user?.role === "CLIENT"
-    ? clientMenus
-    : freelancerMenus;
+    user?.role === "CLIENT"
+      ? clientMenus
+      : freelancerMenus;
 
   function handleLogout() {
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
@@ -171,6 +172,7 @@ function Sidebar() {
         </button>
 
       </div>
+
     </aside>
   );
 }

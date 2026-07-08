@@ -43,4 +43,17 @@ public class ChatController {
 
     }
 
+    @PostMapping("/send")
+    public ChatMessageResponse sendMessageRest(
+            @RequestBody ChatMessageRequest request) {
+
+        ChatMessageResponse response = chatService.sendMessage(request);
+
+        messagingTemplate.convertAndSend(
+                "/topic/conversations/" + response.getConversationId(),
+                response);
+
+        return response;
+    }
+
 }

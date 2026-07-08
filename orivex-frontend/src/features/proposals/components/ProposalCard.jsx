@@ -24,21 +24,37 @@ function ProposalCard({ proposal }) {
 
       onSuccess: () => {
 
-        toast.success(
-          "Proposal accepted successfully."
-        );
+        toast.success("Proposal accepted successfully.");
 
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: [
             "project-proposals",
             proposal.projectId,
           ],
         });
 
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: [
             "project",
             proposal.projectId,
+          ],
+        });
+
+        queryClient.refetchQueries({
+          queryKey: [
+            "my-proposals",
+          ],
+        });
+
+        queryClient.refetchQueries({
+          queryKey: [
+            "my-contracts",
+          ],
+        });
+
+        queryClient.refetchQueries({
+          queryKey: [
+            "client-contracts",
           ],
         });
 
@@ -63,21 +79,37 @@ function ProposalCard({ proposal }) {
 
       onSuccess: () => {
 
-        toast.success(
-          "Proposal rejected successfully."
-        );
+        toast.success("Proposal rejected successfully.");
 
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: [
             "project-proposals",
             proposal.projectId,
           ],
         });
 
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: [
             "project",
             proposal.projectId,
+          ],
+        });
+
+        queryClient.refetchQueries({
+          queryKey: [
+            "my-proposals",
+          ],
+        });
+
+        queryClient.refetchQueries({
+          queryKey: [
+            "my-contracts",
+          ],
+        });
+
+        queryClient.refetchQueries({
+          queryKey: [
+            "client-contracts",
           ],
         });
 

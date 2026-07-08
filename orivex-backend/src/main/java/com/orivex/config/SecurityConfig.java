@@ -52,13 +52,14 @@ public class SecurityConfig {
 
                             .authorizeHttpRequests(auth -> auth
 
-                                            .requestMatchers(
-                                    "/api/v1/auth/login",
-                                    "/api/v1/auth/register",
-                                    "/swagger-ui/**",
-                                    "/swagger-ui.html",
-                                    "/v3/api-docs/**")
-                            .permitAll()
+                                           .requestMatchers(
+                                                           "/api/v1/auth/login",
+                                                           "/api/v1/auth/register",
+                                                           "/swagger-ui/**",
+                                                           "/swagger-ui.html",
+                                                           "/v3/api-docs/**",
+                                                           "/ws/**")
+                                           .permitAll()
 
                             .anyRequest()
                             .authenticated()

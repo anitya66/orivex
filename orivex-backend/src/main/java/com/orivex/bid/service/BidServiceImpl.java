@@ -282,7 +282,7 @@ public class BidServiceImpl implements BidService {
                                             + "\" has been accepted.");
 
             // Create contract
-            contractService.createContract(acceptedBid);
+           // contractService.createContract(acceptedBid);
 
             // Update project status
             Project project = acceptedBid.getProject();

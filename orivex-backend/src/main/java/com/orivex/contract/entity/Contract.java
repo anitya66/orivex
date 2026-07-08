@@ -3,7 +3,7 @@ package com.orivex.contract.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.orivex.bid.entity.Bid;
+import com.orivex.proposal.entity.Proposal;
 import com.orivex.common.entity.BaseEntity;
 import com.orivex.contract.enums.ContractStatus;
 import com.orivex.project.entity.Project;
@@ -40,8 +40,8 @@ public class Contract extends BaseEntity {
     private FreelancerProfile freelancer;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bid_id", nullable = false, unique = true)
-    private Bid bid;
+    @JoinColumn(name = "proposal_id", nullable = false, unique = true)
+    private Proposal proposal;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal agreedBudget;

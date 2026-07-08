@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -12,6 +13,9 @@ function ApplyProposalModal({
   projectId,
   onClose,
 }) {
+
+  const queryClient = useQueryClient();
+
   const {
     mutate,
     isPending,
@@ -30,12 +34,31 @@ function ApplyProposalModal({
   });
 
   function onSubmit(data) {
+
     mutate(data, {
+
       onSuccess: () => {
+
+        queryClient.invalidateQueries({
+          queryKey: ["my-proposals"],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["project", projectId],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["project-proposals", projectId],
+        });
+
         reset();
+
         onClose();
+
       },
+
     });
+
   }
 
   return (

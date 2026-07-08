@@ -6,6 +6,7 @@ import { useUpdateProject } from "../../hooks/useUpdateProject";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
+import { toast } from "sonner";
 
 import { projectSchema } from "../../validation/projectSchema";
 import {
@@ -71,17 +72,31 @@ function CreateProjectModal({
   if (project) {
 
     updateMutate(
-      {
-        id: project.id,
-        data,
-      },
-      {
-        onSuccess: () => {
-          reset();
-          onClose();
-        },
-      }
-    );
+  {
+    id: project.id,
+    data,
+  },
+  {
+    onSuccess: () => {
+
+      toast.success("Project updated successfully.");
+
+      reset();
+
+      onClose();
+
+    },
+
+    onError: (error) => {
+
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to update project."
+      );
+
+    },
+  }
+);
 
     return;
   }

@@ -4,6 +4,8 @@ public enum NotificationType {
 
     PROJECT,
 
+    PROPOSAL,
+
     BID,
 
     CONTRACT,

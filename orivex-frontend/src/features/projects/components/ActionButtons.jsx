@@ -31,18 +31,22 @@ function ActionButtons({
       </button>
 
       <button
-        onClick={onClose}
-        className="rounded-xl bg-yellow-600 px-5 py-3 font-semibold text-white transition hover:bg-yellow-700"
-      >
-        Close Project
-      </button>
+  onClick={() => {
+    console.log("Close button clicked");
+    onClose?.();
+  }}
+  className="rounded-xl bg-yellow-600 px-5 py-3 font-semibold text-white transition hover:bg-yellow-700"
+>
+  Close Project
+</button>
 
       <button
-        onClick={onDelete}
-        className="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-700"
-      >
-        Delete Project
-      </button>
+    onClick={onDelete}
+    disabled={!onDelete}
+    className="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
+>
+    Delete Project
+</button>
 
     </div>
   );

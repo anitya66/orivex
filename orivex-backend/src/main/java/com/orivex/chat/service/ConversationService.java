@@ -13,4 +13,6 @@ public interface ConversationService {
 
     List<ConversationResponse> getMyConversations();
 
+    
+
 }

@@ -157,4 +157,11 @@ public class ProjectController {
                 return projectService.deleteProject(id);
         }
 
+        @PutMapping("/{id}/close")
+        public ApiResponse<ProjectResponse> closeProject(
+                        @PathVariable Long id) {
+
+                return projectService.closeProject(id);
+        }
+
 }

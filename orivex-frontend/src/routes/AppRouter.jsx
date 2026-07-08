@@ -11,6 +11,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import LandingPage from "@/features/landing/pages/LandingPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
+
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
 
 import ProjectsPage from "@/features/projects/pages/ProjectsPage";
@@ -22,24 +23,35 @@ import FreelancerProjectDetailsPage from "@/features/freelancer/pages/Freelancer
 
 import MyProposalsPage from "@/features/proposals/pages/MyProposalsPage";
 
+import ClientContractsPage from "@/features/contracts/pages/ClientContractsPage";
+import MyContractsPage from "@/features/contracts/pages/MyContractsPage";
+import ContractDetailsPage from "@/features/contracts/pages/ContractDetailsPage";
+
+import NotificationsPage from "@/features/notifications/pages/NotificationsPage";
+
+import ChatPage from "@/features/chat/pages/ChatPage";
+
 import NotFoundPage from "@/features/not-found/pages/NotFoundPage";
 
 export default function AppRouter() {
   return (
     <Routes>
 
-      {/* Public */}
+      {/* Public Routes */}
 
       <Route element={<MainLayout />}>
+
         <Route
           path={ROUTES.HOME}
           element={<LandingPage />}
         />
+
       </Route>
 
-      {/* Auth */}
+      {/* Authentication */}
 
       <Route element={<AuthLayout />}>
+
         <Route
           path={ROUTES.LOGIN}
           element={<LoginPage />}
@@ -49,9 +61,10 @@ export default function AppRouter() {
           path={ROUTES.REGISTER}
           element={<RegisterPage />}
         />
+
       </Route>
 
-      {/* Protected */}
+      {/* Dashboard */}
 
       <Route
         path="/dashboard"
@@ -62,12 +75,14 @@ export default function AppRouter() {
         }
       >
 
+        {/* Dashboard Home */}
+
         <Route
           index
           element={<DashboardPage />}
         />
 
-        {/* Client */}
+        {/* ================= CLIENT ================= */}
 
         <Route
           path="projects"
@@ -89,7 +104,7 @@ export default function AppRouter() {
           element={<ProjectDetailsPage />}
         />
 
-        {/* Freelancer */}
+        {/* ================= FREELANCER ================= */}
 
         <Route
           path="browse-projects"
@@ -104,6 +119,37 @@ export default function AppRouter() {
         <Route
           path="my-proposals"
           element={<MyProposalsPage />}
+        />
+
+        {/* ================= CONTRACTS ================= */}
+
+        <Route
+          path="contracts"
+          element={<ClientContractsPage />}
+        />
+
+        <Route
+          path="contracts/:id"
+          element={<ContractDetailsPage />}
+        />
+
+        <Route
+          path="my-contracts"
+          element={<MyContractsPage />}
+        />
+
+        {/* ================= CHAT ================= */}
+
+        <Route
+          path="chat"
+          element={<ChatPage />}
+        />
+
+        {/* ================= NOTIFICATIONS ================= */}
+
+        <Route
+          path="notifications"
+          element={<NotificationsPage />}
         />
 
       </Route>

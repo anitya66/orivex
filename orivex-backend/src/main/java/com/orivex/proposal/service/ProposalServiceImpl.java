@@ -6,9 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.orivex.notification.enums.NotificationType;
+import com.orivex.notification.helper.NotificationHelper;
 import com.orivex.user.entity.ClientProfile;
 import com.orivex.common.response.ApiResponse;
+import com.orivex.contract.service.ContractService;
 import com.orivex.project.entity.Project;
 import com.orivex.project.enums.ProjectStatus;
 import com.orivex.project.repository.ProjectRepository;
@@ -41,6 +43,10 @@ public class ProposalServiceImpl implements ProposalService {
     private final AuthenticationFacade authenticationFacade;
 
     private final FreelancerProfileRepository freelancerProfileRepository;
+
+    private final NotificationHelper notificationHelper;
+
+    private final ContractService contractService;
 
     @Override
     public ApiResponse<ProposalResponse> createProposal(
@@ -94,6 +100,15 @@ public class ProposalServiceImpl implements ProposalService {
     proposal.setStatus(ProposalStatus.PENDING);
 
     Proposal savedProposal = proposalRepository.save(proposal);
+
+    notificationHelper.createNotification(
+            project.getClient().getUser(),
+            NotificationType.PROPOSAL,
+            "New Proposal",
+            freelancer.getUser().getName()
+                    + " submitted a proposal for project \""
+                    + project.getTitle()
+                    + "\".");
 
     logger.info("Proposal created successfully. Id: {}",
             savedProposal.getId());
@@ -180,14 +195,18 @@ public ApiResponse<ProposalResponse> acceptProposal(
     proposal.setStatus(
             ProposalStatus.ACCEPTED);
 
-    proposalRepository.save(proposal);
+    proposalRepository.saveAndFlush(proposal);
+
+    // Create contract
+
+    contractService.createContract(proposal);
 
     /* Update Project */
 
     project.setStatus(
             ProjectStatus.IN_PROGRESS);
 
-    projectRepository.save(project);
+    projectRepository.saveAndFlush(project);
 
     /* Reject Other Pending Proposals */
 
@@ -202,17 +221,20 @@ public ApiResponse<ProposalResponse> acceptProposal(
             pendingProposal.setStatus(
                     ProposalStatus.REJECTED);
 
-            proposalRepository.save(
-                    pendingProposal);
+            proposalRepository.saveAndFlush(pendingProposal);
         }
     }
 
+    Proposal updatedProposal = proposalRepository.findById(proposal.getId())
+                    .orElseThrow();
+
     return ApiResponse.success(
-            proposalMapper.toResponse(proposal),
-            "Proposal accepted successfully.");
+                    proposalMapper.toResponse(updatedProposal),
+                    "Proposal accepted successfully.");
 }
 
 @Override
+@Transactional
 public ApiResponse<ProposalResponse> rejectProposal(
         Long id) {
 

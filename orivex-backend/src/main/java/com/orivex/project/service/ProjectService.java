@@ -7,7 +7,7 @@ import com.orivex.common.dto.PagedResponse;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.project.dto.CreateProjectRequest;
 import com.orivex.project.dto.ProjectResponse;
-import com.orivex.project.dto.UpdateProjectRequest;
+
 import com.orivex.project.enums.ProjectStatus;
 
 public interface ProjectService {
@@ -40,5 +40,7 @@ public interface ProjectService {
         Long id,
                      UpdateProjectRequest request);
         
-     ApiResponse<Void> deleteProject(Long id);                
+     ApiResponse<Void> deleteProject(Long id);
+     
+     ApiResponse<ProjectResponse> closeProject(Long id);
 }

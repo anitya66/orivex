@@ -4,27 +4,27 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.orivex.bid.entity.Bid;
 import com.orivex.contract.entity.Contract;
+import com.orivex.proposal.entity.Proposal;
 import com.orivex.user.entity.ClientProfile;
 import com.orivex.user.entity.FreelancerProfile;
 
 public interface ContractRepository
-        extends JpaRepository<Contract, Long> {
+                extends JpaRepository<Contract, Long> {
 
-    List<Contract> findByFreelancer(
-            FreelancerProfile freelancer);
+        List<Contract> findByFreelancer(
+                        FreelancerProfile freelancer);
 
-    List<Contract> findByClient(
-            ClientProfile client);
+        List<Contract> findByClient(
+                        ClientProfile client);
 
-    boolean existsByBid(
-                    Bid bid);
-   
-    long countByFreelancer(
-                    FreelancerProfile freelancer);
+        boolean existsByProposal(
+                        Proposal proposal);
 
-    long countByClient(
-                    ClientProfile client);                
+        long countByFreelancer(
+                        FreelancerProfile freelancer);
+
+        long countByClient(
+                        ClientProfile client);
 
 }

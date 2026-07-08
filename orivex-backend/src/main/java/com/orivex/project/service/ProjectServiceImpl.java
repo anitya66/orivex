@@ -293,5 +293,39 @@ public ApiResponse<Void> deleteProject(Long id) {
                         "Project deleted successfully.");
 }
 
+@Override
+public ApiResponse<ProjectResponse> closeProject(Long id) {
+
+        User currentUser = authenticationFacade.getCurrentUser();
+
+        ClientProfile client = clientProfileRepository
+                        .findByUser(currentUser)
+                        .orElseThrow(() -> new BadRequestException("Client profile not found."));
+
+        Project project = projectRepository
+                        .findById(id)
+                        .orElseThrow(() -> new BadRequestException("Project not found."));
+
+        if (!project.getClient().getId().equals(client.getId())) {
+
+                throw new BadRequestException(
+                                "You are not allowed to close this project.");
+        }
+
+        if (project.getStatus() == ProjectStatus.CANCELLED) {
+
+                throw new BadRequestException(
+                                "Project is already cancelled.");
+        }
+
+        project.setStatus(ProjectStatus.CANCELLED);
+
+        Project savedProject = projectRepository.save(project);
+
+        return ApiResponse.success(
+                        projectMapper.toResponse(savedProject),
+                        "Project closed successfully.");
+}
+
 
 }
