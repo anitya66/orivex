@@ -1,7 +1,5 @@
 package com.orivex.dashboard.dto;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,20 +13,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FreelancerDashboardResponse {
 
-    private Integer profileCompletion;
+    private Long totalApplications;
 
-    private Long totalBids;
+    private Long acceptedProposals;
 
-    private Long acceptedBids;
-
-    private Long rejectedBids;
+    private Long rejectedProposals;
 
     private Long activeContracts;
 
     private Long completedContracts;
-
-    private Double averageRating;
-
-    private BigDecimal totalEarnings;
-
 }

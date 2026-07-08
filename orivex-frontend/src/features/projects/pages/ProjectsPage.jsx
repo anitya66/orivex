@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import CreateProjectModal from "../components/CreateProjectModal";
 import ProjectGrid from "../components/ProjectGrid";
 import ProjectSearch from "../components/ProjectSearch";
@@ -13,7 +14,18 @@ function ProjectsPage() {
 
   const [search, setSearch] = useState("");
 
-    const [status, setStatus] = useState("");
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+  const keyword = searchParams.get("keyword");
+
+  if (keyword) {
+    setSearch(keyword);
+  }
+  }, [searchParams]);
+  
+
+  const [status, setStatus] = useState("");
     
   const [open, setOpen] = useState(false);
   
@@ -28,6 +40,8 @@ function ProjectsPage() {
       direction: "desc",
       sortBy: "createdAt",
     });
+  
+  
 
   const pagedData = data?.data;
 

@@ -31,5 +31,14 @@ public interface ProposalRepository
 
     List<Proposal> findByProjectAndStatus(
             Project project,
-            ProposalStatus status);        
+                    ProposalStatus status);
+            
+    long countByFreelancer(
+                    FreelancerProfile freelancer);
+
+    long countByFreelancerAndStatus(
+                    FreelancerProfile freelancer,
+                    ProposalStatus status);
+                    
+                    
 }

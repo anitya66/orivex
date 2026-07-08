@@ -23,7 +23,7 @@ public class AdminDashboardResponse {
 
     private Long openProjects;
 
-    private Long completedProjects;
+    private Long closedProjects;
 
     private Long totalContracts;
 

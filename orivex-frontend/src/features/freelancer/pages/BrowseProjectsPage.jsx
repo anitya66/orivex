@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { useProjects } from "../hooks/useProjects";
 
@@ -12,6 +13,16 @@ function BrowseProjectsPage() {
   const [page, setPage] = useState(0);
 
   const [search, setSearch] = useState("");
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+  const keyword = searchParams.get("keyword");
+
+  if (keyword) {
+    setSearch(keyword);
+  }
+}, [searchParams]);
 
   const [status, setStatus] = useState("OPEN");
 

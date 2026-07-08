@@ -1,7 +1,5 @@
 package com.orivex.dashboard.dto;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,14 +17,11 @@ public class ClientDashboardResponse {
 
     private Long openProjects;
 
-    private Long completedProjects;
+    private Long closedProjects;
 
     private Long activeContracts;
 
     private Long completedContracts;
 
-    private Long pendingBids;
-
-    private BigDecimal totalSpent;
-
+    private Long pendingProposals;
 }

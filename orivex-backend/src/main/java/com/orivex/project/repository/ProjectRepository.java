@@ -32,6 +32,12 @@ public interface ProjectRepository
             String keyword,
                     Pageable pageable);
             
-    long countByStatus(ProjectStatus status);                
+    long countByStatus(ProjectStatus status);
+    
+    long countByClient(ClientProfile client);
+
+    long countByClientAndStatus(
+                    ClientProfile client,
+                    ProjectStatus status);
 
         }
