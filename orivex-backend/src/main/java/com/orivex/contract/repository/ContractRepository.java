@@ -34,6 +34,11 @@ public interface ContractRepository
 
         long countByFreelancerAndStatus(
         FreelancerProfile freelancer,
-        ContractStatus status);                
+                        ContractStatus status);
+        
+        long countByStatus(
+                        ContractStatus status);
+
+        List<Contract> findTop5ByOrderByCreatedAtDesc();                             
 
 }

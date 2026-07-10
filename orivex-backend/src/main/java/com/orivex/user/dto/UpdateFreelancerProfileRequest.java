@@ -3,9 +3,12 @@ package com.orivex.user.dto;
 import java.math.BigDecimal;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import jakarta.validation.constraints.NotNull;
 
 @Data
 public class UpdateFreelancerProfileRequest {
@@ -21,8 +24,9 @@ public class UpdateFreelancerProfileRequest {
     @DecimalMin(value = "0.0", message = "Hourly rate must be positive.")
     private BigDecimal hourlyRate;
 
-    @NotBlank(message = "Experience is required.")
-    private String experience;
+    @NotNull(message = "Experience is required.")
+@Min(value = 0, message = "Experience cannot be negative.")
+private Integer experienceYears;
 
     private String skills;
 

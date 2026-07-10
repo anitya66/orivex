@@ -8,6 +8,8 @@ public enum AccountStatus {
 
     SUSPENDED,
 
-    BANNED
+    BANNED,
+
+    DELETED
 
 }

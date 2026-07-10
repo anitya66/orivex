@@ -2,7 +2,7 @@ package com.orivex.user.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.orivex.user.dto.UpdateClientProfileRequest;
 import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.file.dto.FileUploadResponse;
@@ -120,6 +120,30 @@ public class ClientProfileServiceImpl implements ClientProfileService {
                 return ApiResponse.success(
                                 response.getFileDownloadUri(),
                                 "Company logo uploaded successfully.");
+        }
+
+        @Override
+        public ApiResponse<ClientProfileResponse> updateProfile(
+                        UpdateClientProfileRequest request) {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                ClientProfile profile = clientProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Client profile not found."));
+
+                clientProfileMapper.updateEntity(
+                                request,
+                                profile);
+
+                ClientProfile updatedProfile = clientProfileRepository.save(profile);
+
+                ClientProfileResponse response = clientProfileMapper.toResponse(updatedProfile);
+
+                return ApiResponse.success(
+                                response,
+                                "Client profile updated successfully.");
         }
 
 }

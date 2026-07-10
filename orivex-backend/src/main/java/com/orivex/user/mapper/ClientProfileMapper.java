@@ -2,9 +2,11 @@ package com.orivex.user.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.orivex.user.dto.ClientProfileResponse;
 import com.orivex.user.dto.CreateClientProfileRequest;
+import com.orivex.user.dto.UpdateClientProfileRequest;
 import com.orivex.user.entity.ClientProfile;
 
 @Mapper(componentModel = "spring")
@@ -19,5 +21,14 @@ public interface ClientProfileMapper {
     @Mapping(target = "name", source = "user.name")
     @Mapping(target = "email", source = "user.email")
     ClientProfileResponse toResponse(ClientProfile profile);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "companyLogo", ignore = true)
+    void updateEntity(
+            UpdateClientProfileRequest request,
+            @MappingTarget ClientProfile profile);
 
 }

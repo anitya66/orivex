@@ -8,6 +8,10 @@ public enum ProjectStatus {
 
     COMPLETED,
 
-    CANCELLED
+    CANCELLED,
+
+    SUSPENDED,
+
+    DELETED
 
 }

@@ -31,27 +31,30 @@ import NotificationsPage from "@/features/notifications/pages/NotificationsPage"
 
 import ChatPage from "@/features/chat/pages/ChatPage";
 
+import ProfilePage from "@/features/profile/pages/ProfilePage";
+
+import AdminUsersPage from "@/features/admin/pages/AdminUsersPage";
+import AdminProjectsPage from "@/features/admin/pages/AdminProjectsPage";
+import AdminContractsPage from "@/features/admin/pages/AdminContractsPage";
+import AdminAnalyticsPage from "@/features/admin/pages/AdminAnalyticsPage";
+
 import NotFoundPage from "@/features/not-found/pages/NotFoundPage";
 
 export default function AppRouter() {
   return (
     <Routes>
-
-      {/* Public Routes */}
+      {/* ================= PUBLIC ================= */}
 
       <Route element={<MainLayout />}>
-
         <Route
           path={ROUTES.HOME}
           element={<LandingPage />}
         />
-
       </Route>
 
-      {/* Authentication */}
+      {/* ================= AUTH ================= */}
 
       <Route element={<AuthLayout />}>
-
         <Route
           path={ROUTES.LOGIN}
           element={<LoginPage />}
@@ -61,10 +64,9 @@ export default function AppRouter() {
           path={ROUTES.REGISTER}
           element={<RegisterPage />}
         />
-
       </Route>
 
-      {/* Dashboard */}
+      {/* ================= DASHBOARD ================= */}
 
       <Route
         path="/dashboard"
@@ -74,7 +76,6 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       >
-
         {/* Dashboard Home */}
 
         <Route
@@ -152,15 +153,44 @@ export default function AppRouter() {
           element={<NotificationsPage />}
         />
 
+        {/* ================= PROFILE ================= */}
+
+        <Route
+          path="profile"
+          element={<ProfilePage />}
+        />
+
+        {/* ================= ADMIN ================= */}
+
+        <Route path="admin">
+          <Route
+            path="users"
+            element={<AdminUsersPage />}
+          />
+
+          <Route
+            path="projects"
+            element={<AdminProjectsPage />}
+          />
+
+          <Route
+            path="contracts"
+            element={<AdminContractsPage />}
+          />
+
+          <Route
+            path="analytics"
+            element={<AdminAnalyticsPage />}
+          />
+        </Route>
       </Route>
 
-      {/* 404 */}
+      {/* ================= 404 ================= */}
 
       <Route
         path="*"
         element={<NotFoundPage />}
       />
-
     </Routes>
   );
 }

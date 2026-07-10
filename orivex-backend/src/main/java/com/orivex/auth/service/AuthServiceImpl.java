@@ -90,11 +90,25 @@ public class AuthServiceImpl implements AuthService {
                         () -> new BadRequestException(
                                 "Invalid email or password."));
 
-        if (user.getAccountStatus() != AccountStatus.ACTIVE
-                && user.getAccountStatus() != AccountStatus.PENDING_VERIFICATION) {
+        if (user.getAccountStatus() == AccountStatus.DELETED) {
 
-            throw new BadRequestException(
-                    "Account is not active.");
+                throw new BadRequestException(
+                                "This account has been deleted.");
+
+        }
+
+        if (user.getAccountStatus() == AccountStatus.BANNED) {
+
+                throw new BadRequestException(
+                                "Your account has been banned.");
+
+        }
+
+        if (user.getAccountStatus() == AccountStatus.SUSPENDED) {
+
+                throw new BadRequestException(
+                                "Your account has been suspended.");
+
         }
 
         String token = jwtService.generateToken(

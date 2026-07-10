@@ -1,6 +1,8 @@
 package com.orivex.project.repository;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,4 +42,22 @@ public interface ProjectRepository
                     ClientProfile client,
                     ProjectStatus status);
 
+     @Query("""
+
+SELECT
+MONTH(p.createdAt),
+COUNT(p)
+
+FROM Project p
+
+WHERE p.status <> com.orivex.project.enums.ProjectStatus.DELETED
+
+GROUP BY MONTH(p.createdAt)
+
+ORDER BY MONTH(p.createdAt)
+
+""")
+     List<Object[]> getMonthlyProjectGrowth();
+
+     List<Project> findTop5ByOrderByCreatedAtDesc();
         }

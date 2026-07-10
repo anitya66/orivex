@@ -21,7 +21,7 @@ public class FreelancerProfileResponse {
 
     private BigDecimal hourlyRate;
 
-    private String experience;
+    private Integer experienceYears;
 
     private String skills;
 

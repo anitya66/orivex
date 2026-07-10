@@ -8,7 +8,7 @@ import com.orivex.common.response.ApiResponse;
 import com.orivex.user.dto.ClientProfileResponse;
 import com.orivex.user.dto.CreateClientProfileRequest;
 import com.orivex.user.service.ClientProfileService;
-
+import com.orivex.user.dto.UpdateClientProfileRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -47,11 +47,20 @@ public class ClientProfileController {
         value = "/company-logo",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> uploadCompanyLogo(
-        @RequestPart("file") MultipartFile file) {
+            @RequestPart("file") MultipartFile file) {
 
-    return clientProfileService.uploadCompanyLogo(file);
+        return clientProfileService.uploadCompanyLogo(file);
 
-}
+    }
+
+    @PutMapping("/profile")
+    public ApiResponse<ClientProfileResponse> updateProfile(
+            @Valid @RequestBody UpdateClientProfileRequest request) {
+
+        return clientProfileService.updateProfile(request);
+
+    }
+
 
 
 }
