@@ -12,7 +12,7 @@ import { useProjects } from "../hooks/useProjects";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toast } from "sonner";
 
-import ConfirmActionModal from "../components/ConfirmActionModal";
+import ConfirmActionModal from "../../../components/ui/ConfirmActionModal";
 
 import { useUpdateProjectStatus } from "../hooks/useUpdateProjectStatus";
 

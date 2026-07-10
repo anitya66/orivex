@@ -8,7 +8,7 @@ import { useUsers } from "../hooks/useUsers";
 import UserTable from "../components/UserTable";
 import { toast } from "sonner";
 
-import ConfirmActionModal from "../components/ConfirmActionModal";
+import ConfirmActionModal from "../../../components/ui/ConfirmActionModal";
 
 import { useUpdateUserStatus } from "../hooks/useUpdateUserStatus";
 

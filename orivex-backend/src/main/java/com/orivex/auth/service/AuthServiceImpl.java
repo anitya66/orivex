@@ -7,6 +7,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.orivex.security.AuthenticationFacade;
+
+import com.orivex.auth.dto.ChangePasswordRequest;
 
 import com.orivex.auth.dto.CurrentUserResponse;
 import com.orivex.user.entity.User;
@@ -20,10 +23,7 @@ import com.orivex.common.response.ApiResponse;
 import com.orivex.security.JwtService;
 
 import com.orivex.user.enums.AccountStatus;
-
-
-
-
+import com.orivex.security.AuthenticationFacade;
 import com.orivex.security.CustomUserDetails;
 
 import com.orivex.user.repository.UserRepository;
@@ -43,6 +43,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
 
     private final AuthenticationManager authenticationManager;
+
+    private final AuthenticationFacade authenticationFacade;
 
     @Override
     public ApiResponse<String> register(RegisterRequest request) {
@@ -131,21 +133,52 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ApiResponse<CurrentUserResponse> getCurrentUser() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        User user = userDetails.getUser();
+            User user = userDetails.getUser();
 
-        CurrentUserResponse response = CurrentUserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+            CurrentUserResponse response = CurrentUserResponse.builder()
+                            .id(user.getId())
+                            .name(user.getName())
+                            .email(user.getEmail())
+                            .role(user.getRole())
+                            .build();
+
+            return ApiResponse.success(
+                            response,
+                            "User fetched successfully.");
+    }
+    
+    @Override
+public ApiResponse<String> changePassword(
+                ChangePasswordRequest request) {
+
+        User currentUser = authenticationFacade.getCurrentUser();
+
+        if (!passwordEncoder.matches(
+                        request.getCurrentPassword(),
+                        currentUser.getPassword())) {
+
+                throw new BadRequestException(
+                                "Current password is incorrect.");
+        }
+
+        if (request.getCurrentPassword()
+                        .equals(request.getNewPassword())) {
+
+                throw new BadRequestException(
+                                "New password must be different from the current password.");
+        }
+
+        currentUser.setPassword(
+                        passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(currentUser);
 
         return ApiResponse.success(
-                response,
-                "User fetched successfully.");
-    }
+                        "Password changed successfully.");
+}
+
 }

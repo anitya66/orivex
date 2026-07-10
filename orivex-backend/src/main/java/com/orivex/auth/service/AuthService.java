@@ -2,6 +2,7 @@ package com.orivex.auth.service;
 
 import com.orivex.auth.dto.RegisterRequest;
 import com.orivex.common.response.ApiResponse;
+import com.orivex.auth.dto.ChangePasswordRequest;
 import com.orivex.auth.dto.CurrentUserResponse;
 import com.orivex.auth.dto.LoginRequest;
 import com.orivex.auth.dto.LoginResponse;
@@ -13,5 +14,8 @@ public interface AuthService {
     ApiResponse<LoginResponse> login(LoginRequest request);
 
     ApiResponse<CurrentUserResponse> getCurrentUser();
+
+    ApiResponse<String> changePassword(
+        ChangePasswordRequest request);
 
 }

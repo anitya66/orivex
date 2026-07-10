@@ -1,5 +1,6 @@
 package com.orivex.auth.controller;
 
+import com.orivex.auth.dto.ChangePasswordRequest;
 import com.orivex.auth.dto.CurrentUserResponse;
 import com.orivex.auth.dto.LoginRequest;
 import com.orivex.auth.dto.LoginResponse;
@@ -40,6 +41,15 @@ public class AuthController {
     public ApiResponse<CurrentUserResponse> getCurrentUser() {
         return authService.getCurrentUser();
     }
+
+    @PutMapping("/change-password")
+@PreAuthorize("isAuthenticated()")
+public ApiResponse<String> changePassword(
+        @Valid @RequestBody ChangePasswordRequest request) {
+
+    return authService.changePassword(request);
+
+}
 
 
 

@@ -11,20 +11,20 @@ import { STORAGE_KEYS } from "@/constants/storageKeys";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-
   const [user, setUser] = useState(null);
 
   const [loading, setLoading] = useState(true);
 
+  function logout() {
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    setUser(null);
+  }
+
   useEffect(() => {
-
     async function loadUser() {
-
       const token = localStorage.getItem(
         STORAGE_KEYS.ACCESS_TOKEN
-        );
-        
-      console.log("TOKEN:", token);  
+      );
 
       if (!token) {
         setLoading(false);
@@ -32,31 +32,21 @@ export function AuthProvider({ children }) {
       }
 
       try {
-
         const response = await getCurrentUser();
 
-          setUser(response.data);
-          console.log("USER:", response.data);
-          
-
+        setUser(response.data);
       } catch (error) {
-
         console.error(error);
 
         localStorage.removeItem(
           STORAGE_KEYS.ACCESS_TOKEN
         );
-
       } finally {
-
         setLoading(false);
-
       }
-
     }
 
     loadUser();
-
   }, []);
 
   return (
@@ -65,6 +55,7 @@ export function AuthProvider({ children }) {
         user,
         setUser,
         loading,
+        logout,
       }}
     >
       {children}

@@ -7,7 +7,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
-
+import SettingsPage from "@/features/settings/pages/SettingsPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
@@ -153,6 +153,16 @@ export default function AppRouter() {
           element={<NotificationsPage />}
         />
 
+        <Route
+    path="profile"
+    element={<ProfilePage />}
+/>
+
+<Route
+    path="settings"
+    element={<SettingsPage />}
+/>
+
         {/* ================= PROFILE ================= */}
 
         <Route
@@ -182,6 +192,11 @@ export default function AppRouter() {
             path="analytics"
             element={<AdminAnalyticsPage />}
           />
+
+          <Route
+    path="settings"
+    element={<SettingsPage />}
+/>
         </Route>
       </Route>
 

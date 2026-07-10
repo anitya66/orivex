@@ -1,6 +1,15 @@
 import axiosInstance from "@/config/axios";
 import { API } from "@/constants/api";
 
+export async function register(registerData) {
+  const response = await axiosInstance.post(
+    API.AUTH.REGISTER,
+    registerData
+  );
+
+  return response.data;
+}
+
 export async function login(loginData) {
   const response = await axiosInstance.post(
     API.AUTH.LOGIN,
