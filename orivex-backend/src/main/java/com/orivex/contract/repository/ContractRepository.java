@@ -9,9 +9,12 @@ import com.orivex.contract.enums.ContractStatus;
 import com.orivex.proposal.entity.Proposal;
 import com.orivex.user.entity.ClientProfile;
 import com.orivex.user.entity.FreelancerProfile;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ContractRepository
-                extends JpaRepository<Contract, Long> {
+
+public interface ContractRepository extends
+                JpaRepository<Contract, Long>,
+                JpaSpecificationExecutor<Contract> {
 
         List<Contract> findByFreelancer(
                         FreelancerProfile freelancer);

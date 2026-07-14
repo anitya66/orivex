@@ -30,16 +30,16 @@ public class FreelancerProfile extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(nullable = false, length = 150)
+    @Column(length = 150)
     private String headline;
 
-    @Column(nullable = false, length = 1000)
+    @Column(length = 1000)
     private String bio;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal hourlyRate;
 
-    @Column(nullable = false)
+    @Column
     private Integer experienceYears;
 
     @Column(length = 500)
@@ -60,7 +60,7 @@ public class FreelancerProfile extends BaseEntity {
     @Column(length = 500)
     private String resumeUrl;
 
-    @Column(nullable = false)
+    @Column
     private Boolean available;
 
 }

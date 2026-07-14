@@ -69,4 +69,11 @@ public class ProposalController {
         return proposalService.rejectProposal(id);
     }
 
+    @PutMapping("/{id}/withdraw")
+    public ApiResponse<ProposalResponse> withdrawProposal(
+            @PathVariable Long id) {
+
+        return proposalService.withdrawProposal(id);
+    }
+
 }

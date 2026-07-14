@@ -27,6 +27,8 @@ public interface ContractService {
             SubmitWorkRequest request);
 
     ApiResponse<String> approveContract(
-            Long contractId);
+                    Long contractId);
+            
+    ApiResponse<String> cancelContract(Long contractId);                
 
 }

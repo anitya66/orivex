@@ -11,14 +11,20 @@ import com.orivex.user.entity.ClientProfile;
 import com.orivex.user.entity.FreelancerProfile;
 
 public interface ConversationRepository
-        extends JpaRepository<Conversation, Long> {
+                extends JpaRepository<Conversation, Long> {
 
-    Optional<Conversation> findByProject(Project project);
+        Optional<Conversation> findByProject(Project project);
 
-    List<Conversation> findByClientOrderByLastMessageAtDesc(
-            ClientProfile client);
+        List<Conversation> findByClientOrderByLastMessageAtDesc(
+                        ClientProfile client);
 
-    List<Conversation> findByFreelancerOrderByLastMessageAtDesc(
-            FreelancerProfile freelancer);
+        List<Conversation> findByFreelancerOrderByLastMessageAtDesc(
+                        FreelancerProfile freelancer);
+
+        // ================= NEW =================
+
+        Optional<Conversation> findByClientAndFreelancer(
+                        ClientProfile client,
+                        FreelancerProfile freelancer);
 
 }

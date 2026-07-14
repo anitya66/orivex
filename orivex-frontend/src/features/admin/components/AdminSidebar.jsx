@@ -4,6 +4,7 @@ import {
   FolderKanban,
   FileText,
   BarChart3,
+  Shield,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -38,47 +39,101 @@ const menu = [
 
 function AdminSidebar() {
   return (
-    <aside className="w-72 border-r border-slate-800 bg-slate-950">
+    <aside className="flex h-screen w-72 flex-col border-r border-slate-800 bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900">
+
+      {/* Logo */}
 
       <div className="border-b border-slate-800 p-8">
 
-        <h1 className="text-3xl font-bold text-blue-500">
-          ORIVEX
-        </h1>
+        <div className="flex items-center gap-4">
 
-        <p className="mt-2 text-slate-400">
-          Admin Panel
-        </p>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600">
+
+            <Shield
+              size={28}
+              className="text-white"
+            />
+
+          </div>
+
+          <div>
+
+            <h1 className="text-3xl font-black tracking-wide text-white">
+              ORIVEX
+            </h1>
+
+            <p className="text-sm text-blue-400">
+              Admin Console
+            </p>
+
+          </div>
+
+        </div>
 
       </div>
 
-      <nav className="space-y-2 p-5">
+      {/* Menu */}
+
+      <nav className="flex-1 space-y-3 p-5">
 
         {menu.map((item) => {
 
           const Icon = item.icon;
 
           return (
+
             <NavLink
               key={item.title}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-5 py-4 transition
-                ${
+                `group flex items-center gap-4 rounded-2xl px-5 py-4 transition-all duration-300 ${
                   isActive
-                    ? "bg-blue-600 text-white"
-                    : "text-slate-300 hover:bg-slate-800"
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 }`
               }
             >
-              <Icon size={20} />
 
-              {item.title}
+              <Icon
+                size={21}
+                className="transition-transform duration-300 group-hover:scale-110"
+              />
+
+              <span className="font-medium">
+                {item.title}
+              </span>
+
             </NavLink>
+
           );
+
         })}
 
       </nav>
+
+      {/* Footer */}
+
+      <div className="border-t border-slate-800 p-6">
+
+        <div className="rounded-2xl bg-slate-900 p-4">
+
+          <p className="text-xs uppercase tracking-wider text-slate-500">
+            System
+          </p>
+
+          <div className="mt-3 flex items-center gap-2">
+
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+
+            <span className="font-medium text-white">
+              Operational
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
 
     </aside>
   );

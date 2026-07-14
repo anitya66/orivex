@@ -1,10 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { getProjects } from "../api/projectApi";
+
+import { getOpenProjects } from "../api/projectApi";
 
 export function useProjects(params) {
+
   return useQuery({
-    queryKey: ["projects", params],
-    queryFn: () => getProjects(params),
+
+    queryKey: ["open-projects", params],
+
+    queryFn: () => getOpenProjects(params),
+
     keepPreviousData: true,
+
   });
+
 }

@@ -3,6 +3,7 @@ package com.orivex.chat.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +23,17 @@ public class ConversationController {
     public List<ConversationResponse> getMyConversations() {
 
         return conversationService.getMyConversations();
+
+    }
+
+    // ================= NEW =================
+
+    @GetMapping("/freelancer/{freelancerId}")
+    public Long getConversationIdByFreelancer(
+            @PathVariable Long freelancerId) {
+
+        return conversationService
+                .getConversationIdByFreelancer(freelancerId);
 
     }
 

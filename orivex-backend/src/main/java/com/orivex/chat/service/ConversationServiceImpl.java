@@ -60,67 +60,91 @@ public class ConversationServiceImpl
     @Override
     public List<ConversationResponse> getMyConversations() {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+            User currentUser = authenticationFacade.getCurrentUser();
 
-        try {
+            try {
 
-            ClientProfile client = clientProfileRepository
-                    .findByUser(currentUser)
-                    .orElseThrow();
+                    ClientProfile client = clientProfileRepository
+                                    .findByUser(currentUser)
+                                    .orElseThrow();
 
-            return conversationRepository
-                    .findByClientOrderByLastMessageAtDesc(client)
-                    .stream()
-                    .map(conversation -> {
+                    return conversationRepository
+                                    .findByClientOrderByLastMessageAtDesc(client)
+                                    .stream()
+                                    .map(conversation -> {
 
-                        ConversationResponse response =
-                                conversationMapper.toResponse(conversation);
+                                            ConversationResponse response = conversationMapper.toResponse(conversation);
 
-                        response.setOtherUserId(
-                                conversation.getFreelancer()
-                                        .getUser()
-                                        .getId());
+                                            response.setOtherUserId(
+                                                            conversation.getFreelancer()
+                                                                            .getUser()
+                                                                            .getId());
 
-                        response.setOtherUserName(
-                                conversation.getFreelancer()
-                                        .getUser()
-                                        .getName());
+                                            response.setOtherUserName(
+                                                            conversation.getFreelancer()
+                                                                            .getUser()
+                                                                            .getName());
 
-                        return response;
+                                            return response;
 
-                    })
-                    .toList();
+                                    })
+                                    .toList();
 
-        } catch (Exception ignored) {
-            FreelancerProfile freelancer = freelancerProfileRepository
-                    .findByUser(currentUser)
-                    .orElseThrow(() -> new BadRequestException(
-                            "Freelancer profile not found."));
+            } catch (Exception ignored) {
+                    FreelancerProfile freelancer = freelancerProfileRepository
+                                    .findByUser(currentUser)
+                                    .orElseThrow(() -> new BadRequestException(
+                                                    "Freelancer profile not found."));
 
-            return conversationRepository
-                    .findByFreelancerOrderByLastMessageAtDesc(freelancer)
-                    .stream()
-                    .map(conversation -> {
+                    return conversationRepository
+                                    .findByFreelancerOrderByLastMessageAtDesc(freelancer)
+                                    .stream()
+                                    .map(conversation -> {
 
-                        ConversationResponse response = conversationMapper.toResponse(conversation);
+                                            ConversationResponse response = conversationMapper.toResponse(conversation);
 
-                        response.setOtherUserId(
-                                conversation.getClient()
-                                        .getUser()
-                                        .getId());
+                                            response.setOtherUserId(
+                                                            conversation.getClient()
+                                                                            .getUser()
+                                                                            .getId());
 
-                        response.setOtherUserName(
-                                conversation.getClient()
-                                        .getUser()
-                                        .getName());
+                                            response.setOtherUserName(
+                                                            conversation.getClient()
+                                                                            .getUser()
+                                                                            .getName());
 
-                        return response;
+                                            return response;
 
-                    })
-                    .toList();
+                                    })
+                                    .toList();
 
-        }
+            }
 
     }
+
+    @Override
+    public Long getConversationIdByFreelancer(Long freelancerId) {
+
+            User currentUser = authenticationFacade.getCurrentUser();
+
+            ClientProfile client = clientProfileRepository
+                            .findByUser(currentUser)
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Client profile not found."));
+
+            FreelancerProfile freelancer = freelancerProfileRepository
+                            .findById(freelancerId)
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Freelancer not found."));
+
+            Conversation conversation = conversationRepository
+                            .findByClientAndFreelancer(client, freelancer)
+                            .orElseThrow(() -> new BadRequestException(
+                                            "Conversation not found."));
+
+            return conversation.getId();
+    }
+
+    
 
 }

@@ -18,6 +18,8 @@ public interface ClientProfileService {
             
     ApiResponse<String> uploadCompanyLogo(
                     MultipartFile file);
+
+    ApiResponse<String> removeCompanyLogo();                
         
     ApiResponse<ClientProfileResponse> updateProfile(
                     UpdateClientProfileRequest request);    

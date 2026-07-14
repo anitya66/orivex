@@ -1,21 +1,30 @@
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import TrustedCompanies from "../components/TrustedCompanies";
-import Features from "../components/Features";
+import WhyChoose from "../components/WhyChoose";
 import HowItWorks from "../components/HowItWorks";
-import Stats from "../components/Stats";
-import CTA from "../components/CTA";
+import Statistics from "../components/Statistics";
+import CTASection from "../components/CTASection";
+import LandingFooter from "../components/LandingFooter";
 
 function LandingPage() {
   return (
     <>
       <Navbar />
+
       <Hero />
+
       <TrustedCompanies />
-      <Features />
+
+      <WhyChoose />
+
       <HowItWorks />
-      <Stats />
-      <CTA />
+
+      <Statistics />
+
+      <CTASection />
+
+      <LandingFooter />
     </>
   );
 }

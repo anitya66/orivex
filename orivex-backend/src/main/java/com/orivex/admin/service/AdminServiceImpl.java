@@ -1,5 +1,9 @@
 package com.orivex.admin.service;
 
+
+import com.orivex.contract.entity.Contract;
+
+import com.orivex.admin.specification.ContractSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,6 +20,9 @@ import com.orivex.contract.enums.ContractStatus;
 
 
 import com.orivex.contract.repository.ContractRepository;
+import com.orivex.admin.dto.ContractDetailsResponse;
+import com.orivex.admin.dto.ContractResponse;
+import com.orivex.admin.mapper.AdminContractMapper;
 
 import com.orivex.admin.dto.ProjectResponse;
 import com.orivex.admin.dto.UpdateProjectStatusRequest;
@@ -61,6 +68,10 @@ public class AdminServiceImpl implements AdminService {
 
 
         private final ContractRepository contractRepository;
+
+        private final AdminContractMapper adminContractMapper;
+
+      
 
 
 
@@ -210,6 +221,39 @@ public ApiResponse<?> getProjects(
         return ApiResponse.success(
                         response,
                         "Projects fetched successfully.");
+
+}
+
+@Override
+public ApiResponse<?> getContracts(
+
+                String keyword,
+
+                ContractStatus status,
+
+                Pageable pageable
+
+) {
+
+        Page<Contract> contracts = contractRepository.findAll(
+
+                        ContractSpecification.filter(
+                                        keyword,
+                                        status),
+
+                        pageable
+
+        );
+
+        Page<ContractResponse> response = contracts.map(adminContractMapper::toResponse);
+
+        return ApiResponse.success(
+
+                        response,
+
+                        "Contracts fetched successfully."
+
+        );
 
 }
 
@@ -545,6 +589,172 @@ public ApiResponse<?> getRecentActivities() {
                         "Recent activities fetched successfully."
 
         );
+}
+
+@Override
+public ApiResponse<?> getContracts(
+
+                ContractStatus status,
+
+                Pageable pageable
+
+) {
+
+        Page<Contract> contracts;
+
+        if (status == null) {
+
+                contracts = contractRepository.findAll(pageable);
+
+        } else {
+
+                contracts = contractRepository.findAll(
+
+                                (root, query, cb) ->
+
+                                cb.equal(root.get("status"), status),
+
+                                pageable);
+
+        }
+
+        Page<ContractResponse> response =
+
+                        contracts.map(adminContractMapper::toResponse);
+
+        return ApiResponse.success(
+
+                        response,
+
+                        "Contracts fetched successfully."
+
+        );
+
+}
+
+@Override
+public ApiResponse<ContractDetailsResponse> getContractDetails(
+
+                Long contractId
+
+) {
+
+        Contract contract = contractRepository.findById(contractId)
+
+                        .orElseThrow(() ->
+
+                        new ResourceNotFoundException(
+
+                                        "Contract not found."
+
+                        )
+
+                        );
+
+        ContractDetailsResponse response =
+
+                        ContractDetailsResponse.builder()
+
+                                        .id(contract.getId())
+
+                                        .projectTitle(contract.getProject().getTitle())
+
+                                        .clientName(contract.getClient().getCompanyName())
+
+                                        .freelancerName(contract.getFreelancer().getUser().getName())
+
+                                        .agreedBudget(contract.getAgreedBudget())
+
+                                        .deadline(contract.getDeadline())
+
+                                        .status(contract.getStatus())
+
+                                        .submissionUrl(contract.getSubmissionUrl())
+
+                                        .submissionNotes(contract.getSubmissionNotes())
+
+                                        .startedAt(contract.getStartedAt())
+
+                                        .submittedAt(contract.getSubmittedAt())
+
+                                        .createdAt(contract.getCreatedAt())
+
+                                        .build();
+
+        return ApiResponse.success(
+
+                        response,
+
+                        "Contract details fetched successfully."
+
+        );
+
+}
+
+@Override
+public ApiResponse<Void> updateContractStatus(
+
+                Long contractId,
+
+                ContractStatus status
+
+) {
+
+        Contract contract = contractRepository.findById(contractId)
+
+                        .orElseThrow(() ->
+
+                        new ResourceNotFoundException(
+
+                                        "Contract not found."
+
+                        )
+
+                        );
+
+        contract.setStatus(status);
+
+        contractRepository.save(contract);
+
+        return ApiResponse.success(
+
+                        null,
+
+                        "Contract status updated successfully."
+
+        );
+
+}
+
+@Override
+public ApiResponse<Void> deleteContract(
+
+                Long contractId
+
+) {
+
+        Contract contract = contractRepository.findById(contractId)
+
+                        .orElseThrow(() ->
+
+                        new ResourceNotFoundException(
+
+                                        "Contract not found."
+
+                        )
+
+                        );
+
+        contractRepository.delete(contract);
+
+        return ApiResponse.success(
+
+                        null,
+
+                        "Contract deleted successfully."
+
+        );
+
 }
 
 }

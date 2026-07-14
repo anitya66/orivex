@@ -43,4 +43,10 @@ public interface ProjectService {
      ApiResponse<Void> deleteProject(Long id);
      
      ApiResponse<ProjectResponse> closeProject(Long id);
+
+     ApiResponse<PagedResponse<ProjectResponse>> getOpenProjects(
+                     int page,
+                     int size,
+                     String keyword,
+                     Double minBudget);
 }

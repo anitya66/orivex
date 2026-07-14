@@ -1,6 +1,11 @@
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { useProfile } from "../hooks/useProfile";
+
+import { useRemoveProfileImage } from "../hooks/useRemoveProfileImage";
+import { useRemoveCompanyLogo } from "../hooks/useRemoveCompanyLogo";
+import { useRemoveResume } from "../hooks/useRemoveResume";
 
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,6 +25,15 @@ function ProfilePage() {
     isLoading,
     isError,
   } = useProfile();
+
+  const removeProfileImage =
+    useRemoveProfileImage();
+
+  const removeCompanyLogo =
+    useRemoveCompanyLogo();
+
+  const removeResume =
+    useRemoveResume();
 
   const [openEditModal, setOpenEditModal] =
     useState(false);
@@ -48,10 +62,52 @@ function ProfilePage() {
 
   const profile = data.data;
 
+  function handleRemoveImage() {
+    const mutation =
+      user.role === "FREELANCER"
+        ? removeProfileImage
+        : removeCompanyLogo;
+
+    mutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success(
+          user.role === "FREELANCER"
+            ? "Profile image removed."
+            : "Company logo removed."
+        );
+      },
+
+      onError: (error) => {
+        toast.error(
+          error?.response?.data?.message ??
+            "Unable to remove image."
+        );
+      },
+    });
+  }
+
+  function handleRemoveResume() {
+    removeResume.mutate(undefined, {
+      onSuccess: () => {
+        toast.success(
+          "Resume removed successfully."
+        );
+      },
+
+      onError: (error) => {
+        toast.error(
+          error?.response?.data?.message ??
+            "Unable to remove resume."
+        );
+      },
+    });
+  }
+
   return (
     <div className="space-y-8">
 
       <div>
+
         <h1 className="text-4xl font-bold text-white">
           My Profile
         </h1>
@@ -59,6 +115,7 @@ function ProfilePage() {
         <p className="mt-2 text-slate-400">
           View and manage your profile.
         </p>
+
       </div>
 
       <ProfileHeader
@@ -73,6 +130,7 @@ function ProfilePage() {
 
       <ProfileActions
         user={user}
+        profile={profile}
         onEdit={() => setOpenEditModal(true)}
         onUploadResume={() =>
           setOpenResumeModal(true)
@@ -80,6 +138,8 @@ function ProfilePage() {
         onUploadImage={() =>
           setOpenImageModal(true)
         }
+        onRemoveImage={handleRemoveImage}
+        onRemoveResume={handleRemoveResume}
       />
 
       {openEditModal && (
@@ -93,14 +153,13 @@ function ProfilePage() {
       )}
 
       {openImageModal && (
-  <UploadProfileImageModal
-    user={user}
-    onClose={() =>
-      setOpenImageModal(false)
-    }
-  />
-)}
-        
+        <UploadProfileImageModal
+          user={user}
+          onClose={() =>
+            setOpenImageModal(false)
+          }
+        />
+      )}
 
       {user?.role === "FREELANCER" &&
         openResumeModal && (

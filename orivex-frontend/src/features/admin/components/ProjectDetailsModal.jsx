@@ -1,207 +1,258 @@
+import {
+  X,
+  FolderOpen,
+  Building2,
+  Calendar,
+  IndianRupee,
+  Briefcase,
+  Layers,
+  Code2,
+} from "lucide-react";
+
+import ProjectStatusBadge from "./ProjectStatusBadge";
 import { useProjectDetails } from "../hooks/useProjectDetails";
 
-function ProjectDetailsModal({
-
-  projectId,
-
-  onClose,
-
+function Info({
+  title,
+  value,
+  icon,
 }) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5">
 
+      <div className="mb-3 flex items-center gap-2">
+
+        {icon}
+
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          {title}
+        </p>
+
+      </div>
+
+      <p className="break-words text-white">
+        {value || "-"}
+      </p>
+
+    </div>
+  );
+}
+
+function ProjectDetailsModal({
+  projectId,
+  onClose,
+}) {
   const {
-
     data,
-
     isLoading,
-
   } = useProjectDetails(projectId);
 
   if (isLoading) {
-
     return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
 
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+        <div className="rounded-3xl border border-slate-800 bg-slate-900 px-10 py-8 text-white">
 
-        <div className="rounded-2xl bg-slate-900 p-8 text-white">
-
-          Loading...
+          Loading project...
 
         </div>
 
       </div>
-
     );
-
   }
 
   const project = data.data;
 
   return (
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70 p-6 backdrop-blur-sm">
 
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="mx-auto my-10 w-full max-w-6xl rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl">
 
-      <div className="w-full max-w-3xl rounded-2xl bg-slate-900 p-8">
+        {/* Header */}
 
-        <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-slate-800 p-8">
 
-          <h2 className="text-3xl font-bold text-white">
+          <div>
 
-            Project Details
+            <h2 className="text-3xl font-bold text-white">
+              Project Details
+            </h2>
 
-          </h2>
+            <p className="mt-2 text-slate-400">
+              Complete information about this project.
+            </p>
+
+          </div>
 
           <button
-
             onClick={onClose}
-
-            className="text-slate-400 hover:text-white"
-
+            className="rounded-xl bg-slate-800 p-3 transition hover:bg-slate-700"
           >
-
-            ✕
-
+            <X
+              size={22}
+              className="text-white"
+            />
           </button>
 
         </div>
 
-        <div className="grid grid-cols-2 gap-6 text-white">
+        {/* Body */}
 
-          <div>
+        <div className="space-y-8 p-8">
 
-            <p>
+          {/* Project Header */}
 
-              <strong>Title</strong>
+          <div className="flex items-center gap-5">
 
-            </p>
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600/20">
 
-            <p>{project.title}</p>
+              <FolderOpen
+                size={34}
+                className="text-blue-400"
+              />
 
-          </div>
+            </div>
 
-          <div>
+            <div>
 
-            <p>
+              <h3 className="text-3xl font-bold text-white">
+                {project.title}
+              </h3>
 
-              <strong>Client</strong>
+              <p className="mt-2 text-slate-400">
+                {project.clientName}
+              </p>
 
-            </p>
-
-            <p>{project.clientName}</p>
-
-          </div>
-
-          <div>
-
-            <p>
-
-              <strong>Budget</strong>
-
-            </p>
-
-            <p>₹{project.budget}</p>
+            </div>
 
           </div>
 
-          <div>
+          {/* Status */}
 
-            <p>
+          <ProjectStatusBadge
+            status={project.status}
+          />
 
-              <strong>Deadline</strong>
+          {/* Information */}
 
-            </p>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 
-            <p>{project.deadline}</p>
+            <Info
+              title="Client"
+              value={project.clientName}
+              icon={
+                <Building2
+                  size={18}
+                  className="text-blue-400"
+                />
+              }
+            />
+
+            <Info
+              title="Budget"
+              value={`₹${project.budget}`}
+              icon={
+                <IndianRupee
+                  size={18}
+                  className="text-emerald-400"
+                />
+              }
+            />
+
+            <Info
+              title="Deadline"
+              value={project.deadline}
+              icon={
+                <Calendar
+                  size={18}
+                  className="text-orange-400"
+                />
+              }
+            />
+
+            <Info
+              title="Category"
+              value={project.category}
+              icon={
+                <Layers
+                  size={18}
+                  className="text-purple-400"
+                />
+              }
+            />
+
+            <Info
+              title="Project Type"
+              value={project.projectType}
+              icon={
+                <Briefcase
+                  size={18}
+                  className="text-cyan-400"
+                />
+              }
+            />
+
+            <Info
+              title="Experience Level"
+              value={project.experienceLevel}
+              icon={
+                <Code2
+                  size={18}
+                  className="text-pink-400"
+                />
+              }
+            />
 
           </div>
 
-          <div>
+          {/* Description */}
 
-            <p>
+          <div className="rounded-2xl border border-slate-800 bg-slate-950 p-6">
 
-              <strong>Status</strong>
+            <h3 className="mb-4 text-xl font-semibold text-white">
+              Description
+            </h3>
 
+            <p className="leading-8 text-slate-300 whitespace-pre-wrap">
+              {project.description}
             </p>
-
-            <p>{project.status}</p>
 
           </div>
 
-          <div>
+          {/* Skills */}
 
-            <p>
+          <div className="rounded-2xl border border-slate-800 bg-slate-950 p-6">
 
-              <strong>Category</strong>
+            <h3 className="mb-4 text-xl font-semibold text-white">
+              Required Skills
+            </h3>
 
-            </p>
+            <div className="flex flex-wrap gap-3">
 
-            <p>{project.category}</p>
+              {(project.requiredSkills ?? "")
+                .split(",")
+                .filter(Boolean)
+                .map((skill) => (
 
-          </div>
+                  <span
+                    key={skill}
+                    className="rounded-full bg-blue-600/20 px-4 py-2 text-sm font-medium text-blue-400"
+                  >
+                    {skill.trim()}
+                  </span>
 
-          <div>
+                ))}
 
-            <p>
-
-              <strong>Project Type</strong>
-
-            </p>
-
-            <p>{project.projectType}</p>
-
-          </div>
-
-          <div>
-
-            <p>
-
-              <strong>Experience</strong>
-
-            </p>
-
-            <p>{project.experienceLevel}</p>
+            </div>
 
           </div>
-
-        </div>
-
-        <div className="mt-6">
-
-          <h3 className="mb-2 text-lg font-semibold text-white">
-
-            Description
-
-          </h3>
-
-          <p className="text-slate-300">
-
-            {project.description}
-
-          </p>
-
-        </div>
-
-        <div className="mt-6">
-
-          <h3 className="mb-2 text-lg font-semibold text-white">
-
-            Required Skills
-
-          </h3>
-
-          <p className="text-slate-300">
-
-            {project.requiredSkills}
-
-          </p>
 
         </div>
 
       </div>
 
     </div>
-
   );
-
 }
 
 export default ProjectDetailsModal;

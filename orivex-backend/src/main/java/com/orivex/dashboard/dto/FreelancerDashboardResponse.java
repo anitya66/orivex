@@ -13,6 +13,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FreelancerDashboardResponse {
 
+    /**
+     * Indicates whether the freelancer has completed
+     * the marketplace profile.
+     */
+    private Boolean profileCompleted;
+
+    /**
+     * Dashboard Statistics
+     */
     private Long totalApplications;
 
     private Long acceptedProposals;
@@ -22,4 +31,5 @@ public class FreelancerDashboardResponse {
     private Long activeContracts;
 
     private Long completedContracts;
+
 }

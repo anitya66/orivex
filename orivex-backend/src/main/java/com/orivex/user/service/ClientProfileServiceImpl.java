@@ -123,6 +123,35 @@ public class ClientProfileServiceImpl implements ClientProfileService {
         }
 
         @Override
+        public ApiResponse<String> removeCompanyLogo() {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                ClientProfile profile = clientProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Client profile not found."));
+
+                if (profile.getCompanyLogo() == null ||
+                                profile.getCompanyLogo().isBlank()) {
+
+                        throw new BadRequestException(
+                                        "No company logo found.");
+
+                }
+
+                fileService.deleteFile(
+                                profile.getCompanyLogo());
+
+                profile.setCompanyLogo(null);
+
+                clientProfileRepository.save(profile);
+
+                return ApiResponse.success(
+                                "Company logo removed successfully.");
+        }
+
+        @Override
         public ApiResponse<ClientProfileResponse> updateProfile(
                         UpdateClientProfileRequest request) {
 

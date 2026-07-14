@@ -1,56 +1,42 @@
-import SockJS from "sockjs-client/dist/sockjs";
-import { Client } from "@stomp/stompjs";
+import {
+  connectSocket,
+  disconnectSocket,
+  subscribe,
+  publish,
+} from "./socketManager";
 
-let stompClient = null;
-let conversationSubscription = null;
+/* ===============================
+   Socket Connection
+================================ */
 
-export function connectSocket(onConnected) {
-  if (stompClient?.connected) {
-    onConnected?.();
-    return;
-  }
+export {
+  connectSocket,
+  disconnectSocket,
+};
 
-  stompClient = new Client({
-    webSocketFactory: () =>
-      new SockJS("http://localhost:8080/ws"),
+/* ===============================
+   Conversation Subscription
+================================ */
 
-    reconnectDelay: 5000,
-
-    debug: () => {},
-
-    onConnect: () => {
-      console.log("✅ WebSocket Connected");
-      onConnected?.();
-    },
-
-    onStompError: (frame) => {
-      console.error(frame);
-    },
-  });
-
-  stompClient.activate();
-}
-
-export function disconnectSocket() {
-  conversationSubscription?.unsubscribe();
-  conversationSubscription = null;
-
-  stompClient?.deactivate();
-  stompClient = null;
-}
-
-export function subscribeConversation(conversationId, callback) {
-  if (!stompClient?.connected) {
-    console.warn("Socket not connected yet.");
-    return;
-  }
-
-  conversationSubscription?.unsubscribe();
-
-  conversationSubscription = stompClient.subscribe(
+export function subscribeConversation(
+  conversationId,
+  callback
+) {
+  subscribe(
     `/topic/conversations/${conversationId}`,
-    (message) => {
-      callback(JSON.parse(message.body));
-    }
+    callback
+  );
+}
+
+/* ===============================
+   Send Chat Message
+================================ */
+
+export function sendSocketMessage(
+  message
+) {
+  publish(
+    "/app/chat.send",
+    message
   );
 }

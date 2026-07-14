@@ -23,6 +23,8 @@ import com.orivex.user.entity.FreelancerProfile;
 import com.orivex.user.entity.User;
 import com.orivex.user.repository.ClientProfileRepository;
 import com.orivex.user.repository.FreelancerProfileRepository;
+import com.orivex.activity.enums.ActivityType;
+import com.orivex.activity.service.ActivityService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,6 +45,8 @@ public class ContractServiceImpl implements ContractService {
         private final NotificationHelper notificationHelper;
 
         private final ConversationService conversationService;
+
+        private final ActivityService activityService;
 
         @Override
         public ApiResponse<List<ContractResponse>> getMyContracts() {
@@ -123,186 +127,288 @@ public class ContractServiceImpl implements ContractService {
 
         }
 
-    @Override
-public void createContract(Proposal acceptedProposal) {
+        @Override
+        public void createContract(Proposal acceptedProposal) {
 
-    if (contractRepository.existsByProposal(acceptedProposal)) {
+                if (contractRepository.existsByProposal(acceptedProposal)) {
+
+                        throw new BadRequestException(
+                                        "Contract already exists for this proposal.");
+                }
+
+                Contract contract = Contract.builder()
+                                .project(acceptedProposal.getProject())
+                                .client(acceptedProposal.getProject().getClient())
+                                .freelancer(acceptedProposal.getFreelancer())
+                                .proposal(acceptedProposal)
+                                .agreedBudget(acceptedProposal.getProposedBudget())
+                                .deadline(acceptedProposal.getProject().getDeadline())
+                                .status(ContractStatus.PENDING_PAYMENT)
+                                .build();
+
+                Contract savedContract = contractRepository.save(contract);
+
+                conversationService.createConversation(savedContract);
+
+                notificationHelper.createNotification(
+                                savedContract.getFreelancer().getUser(),
+                                NotificationType.CONTRACT,
+                                "New Contract",
+                                "A new contract has been created for project \""
+                                                + savedContract.getProject().getTitle()
+                                                + "\".");
+
+                notificationHelper.createNotification(
+                                savedContract.getClient().getUser(),
+                                NotificationType.CONTRACT,
+                                "Contract Created",
+                                "Contract for project \""
+                                                + savedContract.getProject().getTitle()
+                                                + "\" has been created successfully.");
+
+                activityService.logActivity(
+                                savedContract.getClient().getUser(),
+                                ActivityType.CONTRACT,
+                                "Contract Created",
+                                "Contract created for project \""
+                                                + savedContract.getProject().getTitle()
+                                                + "\".");
+
+                activityService.logActivity(
+                                savedContract.getFreelancer().getUser(),
+                                ActivityType.CONTRACT,
+                                "New Contract",
+                                "You received a contract for project \""
+                                                + savedContract.getProject().getTitle()
+                                                + "\".");
+        }
+
+
+        @Override
+        public ApiResponse<String> startContract(
+                        Long contractId) {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                Contract contract = contractRepository.findById(contractId)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Contract not found."));
+
+                if (!contract.getFreelancer()
+                                .getUser()
+                                .getId()
+                                .equals(currentUser.getId())) {
+
+                        throw new BadRequestException(
+                                        "Only the assigned freelancer can start this contract.");
+                }
+
+                if (contract.getStatus() != ContractStatus.PAID) {
+
+                        throw new BadRequestException(
+                                        "Only paid contracts can be started.");
+
+                
+                }
+
+                contract.setStatus(ContractStatus.ACTIVE);
+
+                contract.setStartedAt(LocalDate.now());
+
+                contractRepository.save(contract);
+
+                notificationHelper.createNotification(
+                                contract.getClient().getUser(),
+                                NotificationType.CONTRACT,
+                                "Contract Started",
+                                "Work has started on project \""
+                                                + contract.getProject().getTitle()
+                                                + "\".");
+
+                activityService.logActivity(
+                                currentUser,
+                                ActivityType.CONTRACT,
+                                "Contract Started",
+                                "You started working on \""
+                                                + contract.getProject().getTitle()
+                                                + "\".");
+
+                return ApiResponse.success(
+                                "Contract started successfully.");
+        }
+
+        @Override
+        public ApiResponse<String> submitWork(
+                        Long contractId,
+                        SubmitWorkRequest request) {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                Contract contract = contractRepository.findById(contractId)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Contract not found."));
+
+                if (!contract.getFreelancer()
+                                .getUser()
+                                .getId()
+                                .equals(currentUser.getId())) {
+
+                        throw new BadRequestException(
+                                        "Only the assigned freelancer can submit work.");
+                }
+
+                if (contract.getStatus() != ContractStatus.ACTIVE) {
+
+                        throw new BadRequestException(
+                                        "Only active contracts can be submitted.");
+                }
+
+                contract.setSubmissionUrl(request.getSubmissionUrl());
+
+                contract.setSubmissionNotes(request.getSubmissionNotes());
+
+                contract.setSubmittedAt(LocalDate.now());
+
+                contract.setStatus(ContractStatus.SUBMITTED);
+
+                contractRepository.save(contract);
+
+                notificationHelper.createNotification(
+                                contract.getClient().getUser(),
+                                NotificationType.CONTRACT,
+                                "Work Submitted",
+                                "The freelancer has submitted work for project \""
+                                                + contract.getProject().getTitle()
+                                                + "\".");
+
+                activityService.logActivity(
+                                currentUser,
+                                ActivityType.CONTRACT,
+                                "Work Submitted",
+                                "You submitted work for project \""
+                                                + contract.getProject().getTitle()
+                                                + "\".");
+
+                return ApiResponse.success(
+                                "Work submitted successfully.");
+        }
+
+        @Override
+        public ApiResponse<String> approveContract(
+                        Long contractId) {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                Contract contract = contractRepository.findById(contractId)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Contract not found."));
+
+                if (!contract.getClient()
+                                .getUser()
+                                .getId()
+                                .equals(currentUser.getId())) {
+
+                        throw new BadRequestException(
+                                        "Only the client can approve this contract.");
+                }
+
+                if (contract.getStatus() != ContractStatus.SUBMITTED) {
+
+                        throw new BadRequestException(
+                                        "Only submitted contracts can be approved.");
+                }
+
+                contract.setStatus(ContractStatus.COMPLETED);
+
+                contractRepository.save(contract);
+
+                notificationHelper.createNotification(
+                                contract.getFreelancer().getUser(),
+                                NotificationType.CONTRACT,
+                                "Contract Completed",
+                                "Congratulations! Your work for project \""
+                                                + contract.getProject().getTitle()
+                                                + "\" has been approved.");
+
+                activityService.logActivity(
+                                currentUser,
+                                ActivityType.CONTRACT,
+                                "Contract Approved",
+                                "You approved work for project \""
+                                                + contract.getProject().getTitle()
+                                                + "\".");
+
+                return ApiResponse.success(
+                                "Contract approved successfully.");
+        }
+    
+    @Override
+public ApiResponse<String> cancelContract(
+        Long contractId) {
+
+    User currentUser = authenticationFacade.getCurrentUser();
+
+    Contract contract = contractRepository.findById(contractId)
+            .orElseThrow(() -> new BadRequestException(
+                    "Contract not found."));
+
+    boolean isClient = contract.getClient()
+            .getUser()
+            .getId()
+            .equals(currentUser.getId());
+
+    boolean isFreelancer = contract.getFreelancer()
+            .getUser()
+            .getId()
+            .equals(currentUser.getId());
+
+    if (!isClient && !isFreelancer) {
 
         throw new BadRequestException(
-                "Contract already exists for this proposal.");
+                "You are not authorized to cancel this contract.");
     }
 
-    Contract contract = Contract.builder()
-            .project(acceptedProposal.getProject())
-            .client(acceptedProposal.getProject().getClient())
-            .freelancer(acceptedProposal.getFreelancer())
-            .proposal(acceptedProposal)
-            .agreedBudget(acceptedProposal.getProposedBudget())
-            .deadline(acceptedProposal.getProject().getDeadline())
-            .status(ContractStatus.PENDING)
-            .build();
+    if (contract.getStatus() == ContractStatus.COMPLETED) {
 
-    Contract savedContract = contractRepository.save(contract);
+        throw new BadRequestException(
+                "Completed contracts cannot be cancelled.");
+    }
 
-    conversationService.createConversation(savedContract);
+    if (contract.getStatus() == ContractStatus.CANCELLED) {
+
+        throw new BadRequestException(
+                "Contract is already cancelled.");
+    }
+
+    contract.setStatus(ContractStatus.CANCELLED);
+
+    contractRepository.save(contract);
 
     notificationHelper.createNotification(
-            savedContract.getFreelancer().getUser(),
+            contract.getClient().getUser(),
             NotificationType.CONTRACT,
-            "New Contract",
-            "A new contract has been created for project \""
-                    + savedContract.getProject().getTitle()
+            "Contract Cancelled",
+            "The contract for project \""
+                    + contract.getProject().getTitle()
+                    + "\" has been cancelled.");
+
+    notificationHelper.createNotification(
+            contract.getFreelancer().getUser(),
+            NotificationType.CONTRACT,
+            "Contract Cancelled",
+            "The contract for project \""
+                    + contract.getProject().getTitle()
+                    + "\" has been cancelled.");
+
+    activityService.logActivity(
+            currentUser,
+            ActivityType.CONTRACT,
+            "Contract Cancelled",
+            "You cancelled the contract for project \""
+                    + contract.getProject().getTitle()
                     + "\".");
 
-    notificationHelper.createNotification(
-            savedContract.getClient().getUser(),
-            NotificationType.CONTRACT,
-            "Contract Created",
-            "Contract for project \""
-        + savedContract.getProject().getTitle()
-        + "\" has been created successfully.");
+    return ApiResponse.success(
+            "Contract cancelled successfully.");
 }
-
-
-    @Override
-    public ApiResponse<String> startContract(
-                    Long contractId) {
-
-            User currentUser = authenticationFacade.getCurrentUser();
-
-            Contract contract = contractRepository.findById(contractId)
-                            .orElseThrow(() -> new BadRequestException(
-                                            "Contract not found."));
-
-            if (!contract.getFreelancer()
-                            .getUser()
-                            .getId()
-                            .equals(currentUser.getId())) {
-
-                    throw new BadRequestException(
-                                    "Only the assigned freelancer can start this contract.");
-
-            }
-
-            if (contract.getStatus() != ContractStatus.PENDING) {
-
-                    throw new BadRequestException(
-                                    "Only pending contracts can be started.");
-
-            }
-
-            contract.setStatus(ContractStatus.ACTIVE);
-
-            contract.setStartedAt(LocalDate.now());
-
-            contractRepository.save(contract);
-
-            notificationHelper.createNotification(
-                            contract.getClient().getUser(),
-                            NotificationType.CONTRACT,
-                            "Contract Started",
-                            "Work has started on project \""
-                                            + contract.getProject().getTitle()
-                                            + "\".");
-
-            return ApiResponse.success(
-                            "Contract started successfully.");
-
-    }
-
-    @Override
-    public ApiResponse<String> submitWork(
-                    Long contractId,
-                    SubmitWorkRequest request) {
-
-            User currentUser = authenticationFacade.getCurrentUser();
-
-            Contract contract = contractRepository.findById(contractId)
-                            .orElseThrow(() -> new BadRequestException(
-                                            "Contract not found."));
-
-            if (!contract.getFreelancer()
-                            .getUser()
-                            .getId()
-                            .equals(currentUser.getId())) {
-
-                    throw new BadRequestException(
-                                    "Only the assigned freelancer can submit work.");
-
-            }
-
-            if (contract.getStatus() != ContractStatus.ACTIVE) {
-
-                    throw new BadRequestException(
-                                    "Only active contracts can be submitted.");
-
-            }
-
-            contract.setSubmissionUrl(request.getSubmissionUrl());
-
-            contract.setSubmissionNotes(request.getSubmissionNotes());
-
-            contract.setSubmittedAt(LocalDate.now());
-
-            contract.setStatus(ContractStatus.SUBMITTED);
-
-            contractRepository.save(contract);
-
-            notificationHelper.createNotification(
-                            contract.getClient().getUser(),
-                            NotificationType.CONTRACT,
-                            "Work Submitted",
-                            "The freelancer has submitted work for project \""
-                                            + contract.getProject().getTitle()
-                                            + "\".");
-
-            return ApiResponse.success(
-                            "Work submitted successfully.");
-
-    }
-
-    @Override
-    public ApiResponse<String> approveContract(
-                    Long contractId) {
-
-            User currentUser = authenticationFacade.getCurrentUser();
-
-            Contract contract = contractRepository.findById(contractId)
-                            .orElseThrow(() -> new BadRequestException(
-                                            "Contract not found."));
-
-            if (!contract.getClient()
-                            .getUser()
-                            .getId()
-                            .equals(currentUser.getId())) {
-
-                    throw new BadRequestException(
-                                    "Only the client can approve this contract.");
-
-            }
-
-            if (contract.getStatus() != ContractStatus.SUBMITTED) {
-
-                    throw new BadRequestException(
-                                    "Only submitted contracts can be approved.");
-
-            }
-
-            contract.setStatus(ContractStatus.COMPLETED);
-
-            contractRepository.save(contract);
-
-            notificationHelper.createNotification(
-                            contract.getFreelancer().getUser(),
-                            NotificationType.CONTRACT,
-                            "Contract Completed",
-                            "Congratulations! Your work for project \""
-                                            + contract.getProject().getTitle()
-                                            + "\" has been approved.");
-
-            return ApiResponse.success(
-                            "Contract approved successfully.");
-
-    }
-
 }

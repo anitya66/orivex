@@ -26,9 +26,13 @@ export async function startContract(contractId) {
   return data;
 }
 
-export async function submitWork(contractId) {
+export async function submitWork({
+  contractId,
+  submissionData,
+}) {
   const { data } = await api.put(
-    `/contracts/${contractId}/submit`
+    `/contracts/${contractId}/submit`,
+    submissionData
   );
 
   return data;

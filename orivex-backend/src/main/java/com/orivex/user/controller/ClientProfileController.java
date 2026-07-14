@@ -61,6 +61,13 @@ public class ClientProfileController {
 
     }
 
+    @DeleteMapping("/company-logo")
+    public ApiResponse<String> removeCompanyLogo() {
+
+        return clientProfileService.removeCompanyLogo();
+
+    }
+
 
 
 }

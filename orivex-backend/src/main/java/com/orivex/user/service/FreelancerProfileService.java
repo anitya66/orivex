@@ -23,7 +23,11 @@ public interface FreelancerProfileService {
         ApiResponse<String> uploadProfileImage(
                         MultipartFile file);
 
+        ApiResponse<String> removeProfileImage();                
+
         ApiResponse<String> uploadResume(
                         MultipartFile file);
+
+        ApiResponse<String> removeResume();
 
 }

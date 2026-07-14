@@ -28,10 +28,10 @@ public class ClientProfile extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(nullable = false, length = 150)
+    @Column(length = 150)
     private String companyName;
 
-    @Column(nullable = false, length = 1000)
+    @Column(length = 1000)
     private String companyDescription;
 
     @Column(length = 255)

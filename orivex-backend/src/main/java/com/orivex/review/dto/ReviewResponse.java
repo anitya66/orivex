@@ -1,6 +1,6 @@
 package com.orivex.review.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +23,6 @@ public class ReviewResponse {
 
     private String comment;
 
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
 }

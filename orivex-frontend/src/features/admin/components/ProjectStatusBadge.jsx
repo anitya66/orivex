@@ -1,34 +1,39 @@
-function ProjectStatusBadge({ status }) {
+const COLORS = {
+  OPEN:
+    "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
 
-  const colors = {
+  IN_PROGRESS:
+    "border-blue-500/30 bg-blue-500/10 text-blue-400",
 
-    OPEN: "bg-green-500/20 text-green-400",
+  COMPLETED:
+    "border-purple-500/30 bg-purple-500/10 text-purple-400",
 
-    IN_PROGRESS: "bg-blue-500/20 text-blue-400",
+  CANCELLED:
+    "border-red-500/30 bg-red-500/10 text-red-400",
 
-    COMPLETED: "bg-purple-500/20 text-purple-400",
+  SUSPENDED:
+    "border-yellow-500/30 bg-yellow-500/10 text-yellow-400",
 
-    CANCELLED: "bg-red-500/20 text-red-400",
+  CLOSED:
+    "border-slate-600 bg-slate-700/30 text-slate-300",
 
-    SUSPENDED: "bg-yellow-500/20 text-yellow-400",
+  DELETED:
+    "border-slate-600 bg-slate-700/30 text-slate-400",
+};
 
-  };
-
+function ProjectStatusBadge({
+  status,
+}) {
   return (
-
     <span
-      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-        colors[status] ??
-        "bg-slate-700 text-white"
+      className={`inline-flex items-center rounded-full border px-4 py-2 text-xs font-semibold ${
+        COLORS[status] ??
+        "border-slate-700 bg-slate-800 text-slate-300"
       }`}
     >
-
-      {status}
-
+      {status.replaceAll("_", " ")}
     </span>
-
   );
-
 }
 
 export default ProjectStatusBadge;

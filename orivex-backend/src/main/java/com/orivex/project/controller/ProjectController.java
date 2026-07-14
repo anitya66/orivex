@@ -164,4 +164,23 @@ public class ProjectController {
                 return projectService.closeProject(id);
         }
 
+        @GetMapping("/open")
+public ApiResponse<PagedResponse<ProjectResponse>> getOpenProjects(
+
+        @RequestParam(defaultValue = "0") int page,
+
+        @RequestParam(defaultValue = "10") int size,
+
+        @RequestParam(required = false) String keyword,
+
+        @RequestParam(required = false) Double minBudget) {
+
+    return projectService.getOpenProjects(
+            page,
+            size,
+            keyword,
+            minBudget);
+}
+
+
 }

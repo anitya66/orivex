@@ -100,8 +100,10 @@ public class ChatServiceImpl
         boolean isFreelancer = conversation.getFreelancer()
                 .getUser()
                 .getId()
-                .equals(currentUser.getId());
+                        .equals(currentUser.getId());
 
+         
+                        
         if (!isClient && !isFreelancer) {
 
             throw new BadRequestException(

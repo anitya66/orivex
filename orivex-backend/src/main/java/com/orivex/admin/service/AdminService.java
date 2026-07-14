@@ -2,6 +2,7 @@ package com.orivex.admin.service;
 
 import org.springframework.data.domain.Pageable;
 
+import com.orivex.admin.dto.ContractDetailsResponse;
 import com.orivex.admin.dto.DashboardResponse;
 import com.orivex.admin.dto.ProjectDetailsResponse;
 import com.orivex.admin.dto.UpdateProjectStatusRequest;
@@ -9,6 +10,7 @@ import com.orivex.admin.dto.UpdateUserStatusRequest;
 import com.orivex.admin.dto.UserDetailsResponse;
 
 import com.orivex.common.response.ApiResponse;
+import com.orivex.contract.enums.ContractStatus;
 import com.orivex.project.enums.ProjectStatus;
 import com.orivex.user.enums.AccountStatus;
 import com.orivex.user.enums.UserRole;
@@ -45,6 +47,25 @@ public interface AdminService {
 
     ApiResponse<DashboardResponse> getDashboard();
 
-    ApiResponse<?> getRecentActivities();                  
+    ApiResponse<?> getRecentActivities();
+    
+    ApiResponse<?> getContracts(
+        String keyword,
+        ContractStatus status,
+                    Pageable pageable);
+
+    ApiResponse<?> getContracts(
+        ContractStatus status,
+        Pageable pageable);
+
+ApiResponse<ContractDetailsResponse> getContractDetails(
+        Long contractId);
+
+ApiResponse<Void> updateContractStatus(
+        Long contractId,
+        ContractStatus status);
+
+ApiResponse<Void> deleteContract(
+        Long contractId);    
 
 }

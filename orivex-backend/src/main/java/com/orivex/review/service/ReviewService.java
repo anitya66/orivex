@@ -5,6 +5,8 @@ import java.util.List;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.review.dto.CreateReviewRequest;
 import com.orivex.review.dto.ReviewResponse;
+import com.orivex.review.dto.ReviewStatusResponse;
+import com.orivex.review.dto.ReviewSummaryResponse;
 
 public interface ReviewService {
 
@@ -17,5 +19,11 @@ public interface ReviewService {
     ApiResponse<List<ReviewResponse>> getReviewsForClient(
             Long clientId);
 
-    ApiResponse<Double> getFreelancerAverageRating(Long freelancerId);          
+    ApiResponse<Double> getFreelancerAverageRating(Long freelancerId);
+    
+    ApiResponse<ReviewSummaryResponse> getFreelancerReviewSummary(
+                    Long freelancerId);
+
+    ApiResponse<ReviewStatusResponse> getReviewStatus(
+        Long contractId);    
 }

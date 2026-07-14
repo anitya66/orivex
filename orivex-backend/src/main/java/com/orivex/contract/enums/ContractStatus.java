@@ -2,12 +2,16 @@ package com.orivex.contract.enums;
 
 public enum ContractStatus {
 
-    PENDING,
+    PENDING_PAYMENT,
+
+    PAID,
 
     ACTIVE,
 
     SUBMITTED,
 
-    COMPLETED
+    COMPLETED,
+
+    CANCELLED
 
 }

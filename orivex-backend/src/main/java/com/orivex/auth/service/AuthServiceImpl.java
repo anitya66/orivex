@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.orivex.security.AuthenticationFacade;
-
+import com.orivex.user.entity.ClientProfile;
+import com.orivex.user.entity.FreelancerProfile;
+import com.orivex.user.enums.UserRole;
+import com.orivex.user.repository.ClientProfileRepository;
+import com.orivex.user.repository.FreelancerProfileRepository;
 import com.orivex.auth.dto.ChangePasswordRequest;
 
 import com.orivex.auth.dto.CurrentUserResponse;
@@ -46,29 +50,52 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationFacade authenticationFacade;
 
+
+    private final ClientProfileRepository clientProfileRepository;
+
+    private final FreelancerProfileRepository freelancerProfileRepository;
+
     @Override
     public ApiResponse<String> register(RegisterRequest request) {
 
-        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+            Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
 
-        if (existingUser.isPresent()) {
+            if (existingUser.isPresent()) {
 
-            throw new BadRequestException(
-                    "Email is already registered.");
+                    throw new BadRequestException(
+                                    "Email is already registered.");
+            }
 
-        }
+            User user = authMapper.toUser(request);
 
-        User user = authMapper.toUser(request);
+            user.setPassword(
+                            passwordEncoder.encode(request.getPassword()));
 
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setAccountStatus(
+                            AccountStatus.PENDING_VERIFICATION);
 
-        user.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
+            User savedUser = userRepository.save(user);
 
-        userRepository.save(user);
+            if (savedUser.getRole() == UserRole.CLIENT) {
 
-        return ApiResponse.success(
-                "User Registered Successfully.");
+                    ClientProfile profile = ClientProfile.builder()
+                                    .user(savedUser)
+                                    .build();
 
+                    clientProfileRepository.save(profile);
+
+            } else if (savedUser.getRole() == UserRole.FREELANCER) {
+
+                    FreelancerProfile profile = FreelancerProfile.builder()
+                                    .user(savedUser)
+                                    .available(true)
+                                    .build();
+
+                    freelancerProfileRepository.save(profile);
+            }
+
+            return ApiResponse.success(
+                            "User Registered Successfully.");
     }
 
     @Override

@@ -13,6 +13,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ClientDashboardResponse {
 
+    /**
+     * Indicates whether the client has completed
+     * the marketplace profile.
+     */
+    private Boolean profileCompleted;
+
+    /**
+     * Dashboard Statistics
+     */
     private Long totalProjects;
 
     private Long openProjects;
@@ -24,4 +33,5 @@ public class ClientDashboardResponse {
     private Long completedContracts;
 
     private Long pendingProposals;
+
 }

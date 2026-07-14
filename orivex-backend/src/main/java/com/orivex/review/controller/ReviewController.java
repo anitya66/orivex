@@ -1,7 +1,7 @@
 package com.orivex.review.controller;
 
 import java.util.List;
-
+import com.orivex.review.dto.ReviewSummaryResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.review.dto.CreateReviewRequest;
 import com.orivex.review.dto.ReviewResponse;
+import com.orivex.review.dto.ReviewStatusResponse;
 import com.orivex.review.service.ReviewService;
 
 import jakarta.validation.Valid;
@@ -55,5 +56,22 @@ public class ReviewController {
         return reviewService.getFreelancerAverageRating(freelancerId);
 
     }
+
+    @GetMapping("/freelancer/{freelancerId}/summary")
+    public ApiResponse<ReviewSummaryResponse> getFreelancerReviewSummary(
+            @PathVariable Long freelancerId) {
+
+        return reviewService.getFreelancerReviewSummary(
+                freelancerId);
+
+    }
+
+    @GetMapping("/contract/{contractId}/status")
+public ApiResponse<ReviewStatusResponse> getReviewStatus(
+        @PathVariable Long contractId) {
+
+    return reviewService.getReviewStatus(contractId);
+
+}
 
 }

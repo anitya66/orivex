@@ -12,6 +12,8 @@ public enum NotificationType {
 
     REVIEW,
 
-    SYSTEM
+    SYSTEM,
+
+    PAYMENT
 
 }

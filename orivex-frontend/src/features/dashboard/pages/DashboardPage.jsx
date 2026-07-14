@@ -1,10 +1,19 @@
+import DashboardSkeleton from "../components/skeletons/DashboardSkeleton";
+
+import EmptyState from "@/components/ui/EmptyState";
+import { useRecentActivity } from "../hooks/useRecentActivity";
+import ActivityTimeline from "../components/activity/ActivityTimeline";
+
 import {
+  Activity,
   Briefcase,
   Gavel,
   FileText,
   Star,
   Users,
 } from "lucide-react";
+
+import CompleteProfileCard from "@/components/dashboard/CompleteProfileCard";
 
 import { useNavigate } from "react-router-dom";
 
@@ -24,13 +33,15 @@ function DashboardPage() {
     isError,
   } = useDashboard();
 
+  const {
+  data: activities = [],
+  isLoading: activityLoading,
+} = useRecentActivity();
+
   if (isLoading) {
-    return (
-      <div className="p-8 text-white">
-        Loading dashboard...
-      </div>
-    );
+  return <DashboardSkeleton />;
   }
+  
 
   if (isError) {
     return (
@@ -43,23 +54,58 @@ function DashboardPage() {
   return (
     <div className="space-y-10">
 
-      {/* Welcome */}
+     {/* Welcome Banner */}
 
-      <div>
+     {data?.profileCompleted === false && (
+    <CompleteProfileCard role={user?.role} />
+      )}
+      
 
-        <h1 className="text-4xl font-bold text-white">
-          Welcome back,
-          <span className="text-blue-500">
-            {" "}
-            {user?.name}
-          </span>
-        </h1>
+<div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-blue-600/20 via-slate-900 to-slate-900 p-8">
 
-        <p className="mt-3 text-slate-400">
-          Here's what's happening in your ORIVEX workspace today.
-        </p>
+  <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-blue-600/10 blur-3xl"></div>
 
-      </div>
+  <div className="relative flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
+
+    <div>
+
+      <span className="rounded-full bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-400">
+        👋 Welcome Back
+      </span>
+
+      <h1 className="mt-5 text-4xl font-bold text-white lg:text-5xl">
+        {user?.name}
+      </h1>
+
+      <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-400">
+        Manage projects, contracts, proposals and
+        collaboration from one beautiful workspace.
+      </p>
+
+    </div>
+
+    <button
+      onClick={() =>
+        navigate(
+          user?.role === "CLIENT"
+            ? "/dashboard/my-projects"
+            : user?.role === "FREELANCER"
+            ? "/dashboard/browse-projects"
+            : "/dashboard/admin/analytics"
+        )
+      }
+      className="rounded-2xl bg-blue-600 px-8 py-4 text-lg font-semibold text-white transition hover:bg-blue-700"
+    >
+      {user?.role === "CLIENT"
+        ? "Create Project"
+        : user?.role === "FREELANCER"
+        ? "Browse Projects"
+        : "View Analytics"}
+    </button>
+
+  </div>
+
+</div>
 
       {/* CLIENT */}
 
@@ -71,7 +117,7 @@ function DashboardPage() {
             title="Total Projects"
             value={data.totalProjects}
             icon={Briefcase}
-            onClick={() => navigate("/dashboard/projects")}
+            onClick={() => navigate("/dashboard/my-projects")}
           />
 
           <StatsCard
@@ -79,7 +125,7 @@ function DashboardPage() {
             value={data.openProjects}
             icon={Briefcase}
             color="text-green-500"
-            onClick={() => navigate("/dashboard/projects")}
+            onClick={() => navigate("/dashboard/my-projects")}
           />
 
           <StatsCard
@@ -87,7 +133,7 @@ function DashboardPage() {
             value={data.closedProjects}
             icon={Briefcase}
             color="text-red-500"
-            onClick={() => navigate("/dashboard/projects")}
+            onClick={() => navigate("/dashboard/my-projects")}
           />
 
           <StatsCard
@@ -111,7 +157,7 @@ function DashboardPage() {
             value={data.pendingProposals}
             icon={Gavel}
             color="text-pink-500"
-            onClick={() => navigate("/dashboard/projects")}
+            onClick={() => navigate("/dashboard/my-projects")}
           />
 
         </div>
@@ -238,133 +284,199 @@ function DashboardPage() {
 
       )}
 
-      {/* ================= RECENT ACTIVITY ================= */}
+     {/* ================= RECENT ACTIVITY ================= */}
 
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+<div className="overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950">
 
-        <div className="flex items-center justify-between">
+  <div className="flex items-center justify-between border-b border-slate-800 px-8 py-6">
 
-          <h2 className="text-xl font-semibold text-white">
-            Recent Activity
-          </h2>
+    <div>
 
-          <span className="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-400">
-            Coming Soon
-          </span>
+      <h2 className="text-2xl font-bold text-white">
+        Recent Activity
+      </h2>
 
-        </div>
-
-        <div className="mt-6 rounded-xl border border-dashed border-slate-700 p-10 text-center">
-
-          <h3 className="text-lg font-semibold text-white">
-            No recent activity
-          </h3>
-
-          <p className="mt-2 text-slate-500">
-            Once you start creating projects, applying for jobs,
-            signing contracts, or receiving messages,
-            your latest activity will appear here.
-          </p>
-
-        </div>
-
-      </div>
-
-      {/* ================= QUICK ACTIONS ================= */}
-
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-
-        <h2 className="text-xl font-semibold text-white">
-          Quick Actions
-        </h2>
-
-        <div className="mt-6 flex flex-wrap gap-4">
-
-          {/* CLIENT */}
-
-          {user?.role === "CLIENT" && (
-  <>
-    <button
-      onClick={() => navigate("/dashboard/projects")}
-      className="rounded-xl bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
-    >
-      ➕ Create Project
-    </button>
-
-    <button
-      onClick={() => navigate("/dashboard/chat")}
-      className="rounded-xl bg-slate-800 px-5 py-3 font-medium text-white transition hover:bg-slate-700"
-    >
-      💬 Open Chat
-    </button>
-
-    <button
-      onClick={() => navigate("/dashboard/notifications")}
-      className="rounded-xl bg-slate-800 px-5 py-3 font-medium text-white transition hover:bg-slate-700"
-    >
-      🔔 Notifications
-    </button>
-  </>
-)}
-
-          {/* FREELANCER */}
-
-         {user?.role === "FREELANCER" && (
-  <>
-    <button
-      onClick={() => navigate("/dashboard/browse-projects")}
-      className="rounded-xl bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
-    >
-      🔍 Browse Projects
-    </button>
-
-    <button
-      onClick={() => navigate("/dashboard/chat")}
-      className="rounded-xl bg-slate-800 px-5 py-3 font-medium text-white transition hover:bg-slate-700"
-    >
-      💬 Open Chat
-    </button>
-
-    <button
-      onClick={() => navigate("/dashboard/notifications")}
-      className="rounded-xl bg-slate-800 px-5 py-3 font-medium text-white transition hover:bg-slate-700"
-    >
-      🔔 Notifications
-    </button>
-  </>
-)}
-          {/* ADMIN */}
-
-         {user?.role === "ADMIN" && (
-  <>
-    <button
-      onClick={() => navigate("/dashboard")}
-      className="rounded-xl bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
-    >
-      📊 Analytics
-    </button>
-
-    <button
-      onClick={() => navigate("/dashboard/projects")}
-      className="rounded-xl bg-slate-800 px-5 py-3 font-medium text-white transition hover:bg-slate-700"
-    >
-      📁 Manage Projects
-    </button>
-
-    <button
-      onClick={() => navigate("/dashboard/notifications")}
-      className="rounded-xl bg-slate-800 px-5 py-3 font-medium text-white transition hover:bg-slate-700"
-    >
-      🔔 Notifications
-    </button>
-  </>
-)}
-
-        </div>
-
-      </div>
+      <p className="mt-1 text-sm text-slate-400">
+        Your latest actions across ORIVEX.
+      </p>
 
     </div>
+
+    <span className="rounded-full bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400">
+      Live Feed
+    </span>
+
+  </div>
+
+  <div className="p-8">
+
+    {activityLoading ? (
+
+      <p className="text-slate-400">
+        Loading activities...
+      </p>
+
+    ) : (
+
+      <ActivityTimeline
+        activities={activities}
+        actionText={
+          user?.role === "CLIENT"
+            ? "Create Project"
+            : user?.role === "FREELANCER"
+            ? "Browse Projects"
+            : "Manage Projects"
+        }
+        onAction={() =>
+          navigate(
+            user?.role === "CLIENT"
+              ? "/dashboard/my-projects"
+              : user?.role === "FREELANCER"
+              ? "/dashboard/browse-projects"
+              : "/dashboard/admin/projects"
+          )
+        }
+      />
+
+    )}
+
+  </div>
+
+</div>
+
+     {/* ================= QUICK ACTIONS ================= */}
+
+<div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
+
+  <div className="mb-8">
+
+    <h2 className="text-2xl font-bold text-white">
+      Quick Actions
+    </h2>
+
+    <p className="mt-2 text-slate-400">
+      Jump directly to the features you use most.
+    </p>
+
+  </div>
+
+  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+    {/* CLIENT */}
+
+    {user?.role === "CLIENT" && (
+      <>
+        <ActionCard
+          emoji="📁"
+          title="Create Project"
+          description="Post a new project and hire talented freelancers."
+          onClick={() => navigate("/dashboard/projects")}
+        />
+
+        <ActionCard
+          emoji="💬"
+          title="Open Chat"
+          description="Continue conversations with freelancers."
+          onClick={() => navigate("/dashboard/chat")}
+        />
+
+        <ActionCard
+          emoji="🔔"
+          title="Notifications"
+          description="Review your latest updates and alerts."
+          onClick={() => navigate("/dashboard/notifications")}
+        />
+      </>
+    )}
+
+    {/* FREELANCER */}
+
+    {user?.role === "FREELANCER" && (
+      <>
+        <ActionCard
+          emoji="🔍"
+          title="Browse Projects"
+          description="Find your next freelance opportunity."
+          onClick={() => navigate("/dashboard/browse-projects")}
+        />
+
+        <ActionCard
+          emoji="💬"
+          title="Open Chat"
+          description="Stay connected with your clients."
+          onClick={() => navigate("/dashboard/chat")}
+        />
+
+        <ActionCard
+          emoji="🔔"
+          title="Notifications"
+          description="Keep up with proposals and contracts."
+          onClick={() => navigate("/dashboard/notifications")}
+        />
+      </>
+    )}
+
+    {/* ADMIN */}
+
+    {user?.role === "ADMIN" && (
+      <>
+        <ActionCard
+          emoji="📊"
+          title="Analytics"
+          description="View platform analytics and reports."
+          onClick={() => navigate("/dashboard/admin/analytics")}
+        />
+
+        <ActionCard
+          emoji="📁"
+          title="Projects"
+          description="Manage all platform projects."
+          onClick={() => navigate("/dashboard/admin/projects")}
+        />
+
+        <ActionCard
+          emoji="🔔"
+          title="Notifications"
+          description="Review platform notifications."
+          onClick={() => navigate("/dashboard/notifications")}
+        />
+      </>
+    )}
+
+  </div>
+
+</div>
+
+    </div>
+  );
+}
+function ActionCard({
+  emoji,
+  title,
+  description,
+  onClick,
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="group rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-6 text-left transition-all duration-300 hover:-translate-y-2 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-500/10"
+    >
+      <div className="mb-5 text-4xl">
+        {emoji}
+      </div>
+
+      <h3 className="text-xl font-bold text-white">
+        {title}
+      </h3>
+
+      <p className="mt-3 leading-7 text-slate-400">
+        {description}
+      </p>
+
+      <span className="mt-6 inline-block font-semibold text-blue-400 transition group-hover:translate-x-1">
+        Open →
+      </span>
+    </button>
   );
 }
 

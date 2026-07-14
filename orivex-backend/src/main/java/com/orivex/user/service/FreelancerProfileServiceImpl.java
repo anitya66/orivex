@@ -149,6 +149,35 @@ public class FreelancerProfileServiceImpl implements FreelancerProfileService {
         }
 
         @Override
+        public ApiResponse<String> removeProfileImage() {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                FreelancerProfile profile = freelancerProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
+
+                if (profile.getProfileImage() == null ||
+                                profile.getProfileImage().isBlank()) {
+
+                        throw new BadRequestException(
+                                        "No profile image found.");
+
+                }
+
+                fileService.deleteFile(
+                                profile.getProfileImage());
+
+                profile.setProfileImage(null);
+
+                freelancerProfileRepository.save(profile);
+
+                return ApiResponse.success(
+                                "Profile image removed successfully.");
+        }
+
+        @Override
         public ApiResponse<String> uploadResume(
                         MultipartFile file) {
 
@@ -180,6 +209,35 @@ public class FreelancerProfileServiceImpl implements FreelancerProfileService {
                                 response.getFileDownloadUri(),
                                 "Resume uploaded successfully.");
 
+        }
+        
+        @Override
+        public ApiResponse<String> removeResume() {
+
+                User currentUser = authenticationFacade.getCurrentUser();
+
+                FreelancerProfile profile = freelancerProfileRepository
+                                .findByUser(currentUser)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Freelancer profile not found."));
+
+                if (profile.getResumeUrl() == null ||
+                                profile.getResumeUrl().isBlank()) {
+
+                        throw new BadRequestException(
+                                        "No resume found.");
+
+                }
+
+                fileService.deleteFile(
+                                profile.getResumeUrl());
+
+                profile.setResumeUrl(null);
+
+                freelancerProfileRepository.save(profile);
+
+                return ApiResponse.success(
+                                "Resume removed successfully.");
         }
 
 }

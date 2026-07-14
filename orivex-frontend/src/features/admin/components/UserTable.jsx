@@ -1,97 +1,80 @@
 import UserRow from "./UserRow";
 
 function UserTable({
-
   users,
-
   onView,
-
   onToggleStatus,
-
   onDelete,
-
 }) {
-
   if (!users.length) {
-
     return (
-
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-10 text-center text-slate-400">
-
+      <div className="rounded-3xl border border-slate-800 bg-slate-900 p-14 text-center text-slate-400">
         No users found.
-
       </div>
-
     );
-
   }
 
   return (
+    <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-xl">
 
-    <div className="overflow-hidden rounded-2xl border border-slate-800">
+      <div className="overflow-x-auto">
 
-      <table className="min-w-full">
+        <table className="min-w-full">
 
-        <thead className="bg-slate-900">
+          <thead className="border-b border-slate-800 bg-slate-950">
 
-          <tr className="text-left text-slate-300">
+            <tr>
 
-            <th className="px-6 py-4">
-              ID
-            </th>
+              <th className="px-6 py-5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                ID
+              </th>
 
-            <th className="px-6 py-4">
-              Name
-            </th>
+              <th className="px-6 py-5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                User
+              </th>
 
-            <th className="px-6 py-4">
-              Email
-            </th>
+              <th className="px-6 py-5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Email
+              </th>
 
-            <th className="px-6 py-4">
-              Role
-            </th>
+              <th className="px-6 py-5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Role
+              </th>
 
-            <th className="px-6 py-4">
-              Status
-            </th>
+              <th className="px-6 py-5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Status
+              </th>
 
-            <th className="px-6 py-4 text-center">
-              Actions
-            </th>
+              <th className="px-6 py-5 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Actions
+              </th>
 
-          </tr>
+            </tr>
 
-        </thead>
+          </thead>
 
-        <tbody className="bg-slate-950">
+          <tbody>
 
-          {users.map((user) => (
+            {users.map((user) => (
 
-            <UserRow
+              <UserRow
+                key={user.id}
+                user={user}
+                onView={onView}
+                onToggleStatus={onToggleStatus}
+                onDelete={onDelete}
+              />
 
-              key={user.id}
+            ))}
 
-              user={user}
+          </tbody>
 
-              onView={onView}
+        </table>
 
-              onToggleStatus={onToggleStatus}
-
-              onDelete={onDelete}
-
-            />
-
-          ))}
-
-        </tbody>
-
-      </table>
+      </div>
 
     </div>
-
   );
-
 }
 
 export default UserTable;

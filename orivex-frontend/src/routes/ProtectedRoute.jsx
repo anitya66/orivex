@@ -5,15 +5,21 @@ import { ROUTES } from "@/constants/routes";
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
 
-  console.log("Loading:", loading);
-  console.log("User:", user);
-
   if (loading) {
-    return <h1>Loading...</h1>;
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-950 text-white">
+        Loading...
+      </div>
+    );
   }
 
   if (!user) {
-    return <Navigate to={ROUTES.LOGIN} replace />;
+    return (
+      <Navigate
+        to={ROUTES.HOME}
+        replace
+      />
+    );
   }
 
   return children;

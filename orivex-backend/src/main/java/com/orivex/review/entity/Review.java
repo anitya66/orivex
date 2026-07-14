@@ -1,25 +1,21 @@
 package com.orivex.review.entity;
 
-import java.time.LocalDate;
-
+import com.orivex.common.entity.BaseEntity;
 import com.orivex.contract.entity.Contract;
 import com.orivex.user.entity.User;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "reviews")
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Review {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Review extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract_id", nullable = false)
@@ -38,8 +34,5 @@ public class Review {
 
     @Column(length = 1000)
     private String comment;
-
-    @Column(nullable = false)
-    private LocalDate createdAt;
 
 }

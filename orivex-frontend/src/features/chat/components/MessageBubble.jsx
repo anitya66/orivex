@@ -1,28 +1,110 @@
+import {
+  Check,
+  CheckCheck,
+} from "lucide-react";
+
 function MessageBubble({
   message,
   currentUserId,
 }) {
-  const mine = message.senderId === currentUserId;
+  const mine =
+    message.senderId === currentUserId;
+
+  const formattedTime = message.createdAt
+    ? new Date(message.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
+
+  const initials = message.senderName
+    ?.split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <div
-      className={`flex ${
-        mine ? "justify-end" : "justify-start"
+      className={`flex items-end gap-3 ${
+        mine
+          ? "justify-end"
+          : "justify-start"
       }`}
     >
+      {/* Avatar */}
+
+      {!mine && (
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-xs font-bold text-white shadow-lg">
+
+          {initials}
+
+        </div>
+      )}
+
+      {/* Bubble */}
+
       <div
-        className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+        className={`group max-w-[72%] rounded-3xl px-5 py-4 shadow-lg transition-all duration-300 hover:scale-[1.01] ${
           mine
-            ? "bg-blue-600 text-white"
-            : "bg-slate-800 text-white"
+            ? "rounded-br-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white"
+            : "rounded-bl-lg border border-slate-700 bg-slate-800 text-white"
         }`}
       >
-        <p>{message.message}</p>
+        <p className="break-words whitespace-pre-wrap leading-7">
 
-        <p className="mt-2 text-right text-xs opacity-70">
-          {message.senderName}
+          {message.message}
+
         </p>
+
+        <div
+          className={`mt-3 flex items-center gap-2 text-[11px] ${
+            mine
+              ? "justify-end text-blue-100"
+              : "justify-between text-slate-400"
+          }`}
+        >
+          {!mine && (
+            <span className="font-medium">
+
+              {message.senderName}
+
+            </span>
+          )}
+
+          <div className="flex items-center gap-1">
+
+            <span>
+
+              {formattedTime}
+
+            </span>
+
+            {mine && (
+              <>
+                {/* Replace with real read status later */}
+
+                <CheckCheck
+                  size={13}
+                  className="text-blue-200"
+                />
+              </>
+            )}
+
+          </div>
+
+        </div>
       </div>
+
+      {/* My Avatar */}
+
+      {mine && (
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white shadow-lg">
+
+          {initials}
+
+        </div>
+      )}
     </div>
   );
 }

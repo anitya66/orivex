@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
+import AiMatchingSection from "../components/AiMatchingSection";
 import { useProject } from "../hooks/useProject";
 import { useProjectProposals } from "@/features/proposals/hooks/useProjectProposals";
 
@@ -122,33 +122,66 @@ export default function ProjectDetailsPage() {
 
       {/* Header */}
 
-      <div>
+<div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-blue-600/20 via-slate-900 to-slate-900 p-8">
 
-        <h1 className="text-4xl font-bold text-white">
-          {project.title}
-        </h1>
+  <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-blue-600/10 blur-3xl" />
 
-        <p className="mt-3 text-slate-400">
-          {project.description}
-        </p>
+  <div className="relative">
 
-      </div>
+    <span className="inline-flex rounded-full bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-400">
 
-      {/* Project Info */}
+      {project.status}
 
-      <ProjectInfoCard project={project} />
+    </span>
 
-      {/* Skills */}
+    <h1 className="mt-5 text-4xl font-black text-white lg:text-5xl">
 
-      <SkillsCard
-        skills={project.requiredSkills}
-      />
+      {project.title}
 
-      {/* Client */}
+    </h1>
 
-      <ClientCard
-        project={project}
-      />
+    <p className="mt-5 max-w-4xl text-lg leading-8 text-slate-400">
+
+      {project.description}
+
+    </p>
+
+  </div>
+
+</div>
+
+      <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+
+  {/* LEFT */}
+
+  <div className="space-y-8">
+
+    <ProjectInfoCard
+      project={project}
+    />
+
+    <SkillsCard
+      skills={project.requiredSkills}
+    />
+
+    <AiMatchingSection
+      projectId={project.id}
+    />
+
+  </div>
+
+  {/* RIGHT */}
+
+  <div className="space-y-8 lg:sticky lg:top-8 lg:self-start">
+
+    <ClientCard
+      project={project}
+    />
+
+  </div>
+
+</div>
+      
 
       {/* Proposals */}
 

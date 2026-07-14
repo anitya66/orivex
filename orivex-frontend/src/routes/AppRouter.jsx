@@ -7,7 +7,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import SettingsPage from "@/features/settings/pages/SettingsPage";
+
 import LandingPage from "@/features/landing/pages/LandingPage";
 import LoginPage from "@/features/auth/pages/LoginPage";
 import RegisterPage from "@/features/auth/pages/RegisterPage";
@@ -20,6 +20,7 @@ import ProjectDetailsPage from "@/features/projects/pages/ProjectDetailsPage";
 
 import BrowseProjectsPage from "@/features/freelancer/pages/BrowseProjectsPage";
 import FreelancerProjectDetailsPage from "@/features/freelancer/pages/FreelancerProjectDetailsPage";
+import FreelancerProfilePage from "@/features/freelancer/pages/FreelancerProfilePage";
 
 import MyProposalsPage from "@/features/proposals/pages/MyProposalsPage";
 
@@ -32,17 +33,21 @@ import NotificationsPage from "@/features/notifications/pages/NotificationsPage"
 import ChatPage from "@/features/chat/pages/ChatPage";
 
 import ProfilePage from "@/features/profile/pages/ProfilePage";
+import SettingsPage from "@/features/settings/pages/SettingsPage";
 
 import AdminUsersPage from "@/features/admin/pages/AdminUsersPage";
 import AdminProjectsPage from "@/features/admin/pages/AdminProjectsPage";
 import AdminContractsPage from "@/features/admin/pages/AdminContractsPage";
 import AdminAnalyticsPage from "@/features/admin/pages/AdminAnalyticsPage";
 
+import CallPage from "@/features/call/pages/CallPage";
+
 import NotFoundPage from "@/features/not-found/pages/NotFoundPage";
 
 export default function AppRouter() {
   return (
     <Routes>
+
       {/* ================= PUBLIC ================= */}
 
       <Route element={<MainLayout />}>
@@ -66,6 +71,17 @@ export default function AppRouter() {
         />
       </Route>
 
+      {/* ================= CALL ================= */}
+
+      <Route
+        path="/call"
+        element={
+          <ProtectedRoute>
+            <CallPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* ================= DASHBOARD ================= */}
 
       <Route
@@ -76,7 +92,8 @@ export default function AppRouter() {
           </ProtectedRoute>
         }
       >
-        {/* Dashboard Home */}
+
+        {/* Dashboard */}
 
         <Route
           index
@@ -103,6 +120,11 @@ export default function AppRouter() {
         <Route
           path="my-projects/:id"
           element={<ProjectDetailsPage />}
+        />
+
+        <Route
+          path="freelancers/:freelancerId"
+          element={<FreelancerProfilePage />}
         />
 
         {/* ================= FREELANCER ================= */}
@@ -153,15 +175,12 @@ export default function AppRouter() {
           element={<NotificationsPage />}
         />
 
-        <Route
-    path="profile"
-    element={<ProfilePage />}
-/>
+        {/* ================= SETTINGS ================= */}
 
-<Route
-    path="settings"
-    element={<SettingsPage />}
-/>
+        <Route
+          path="settings"
+          element={<SettingsPage />}
+        />
 
         {/* ================= PROFILE ================= */}
 
@@ -173,6 +192,7 @@ export default function AppRouter() {
         {/* ================= ADMIN ================= */}
 
         <Route path="admin">
+
           <Route
             path="users"
             element={<AdminUsersPage />}
@@ -194,10 +214,12 @@ export default function AppRouter() {
           />
 
           <Route
-    path="settings"
-    element={<SettingsPage />}
-/>
+            path="settings"
+            element={<SettingsPage />}
+          />
+
         </Route>
+
       </Route>
 
       {/* ================= 404 ================= */}
@@ -206,6 +228,7 @@ export default function AppRouter() {
         path="*"
         element={<NotFoundPage />}
       />
+
     </Routes>
   );
 }

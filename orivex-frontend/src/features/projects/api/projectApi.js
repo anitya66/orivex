@@ -1,7 +1,7 @@
 import api from "@/config/axios";
 
-export async function getProjects(params) {
-  const response = await api.get("/projects/paginated", {
+export async function getOpenProjects(params) {
+  const response = await api.get("/projects/open", {
     params,
   });
 

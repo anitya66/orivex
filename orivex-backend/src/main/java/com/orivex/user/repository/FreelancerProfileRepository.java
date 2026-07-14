@@ -11,6 +11,9 @@ public interface FreelancerProfileRepository extends JpaRepository<FreelancerPro
 
     Optional<FreelancerProfile> findByUser(User user);
 
+    Optional<FreelancerProfile> findByUserId(
+            Long userId);
+
     List<FreelancerProfile> findByAvailableTrue();
 
     boolean existsByUser(User user);

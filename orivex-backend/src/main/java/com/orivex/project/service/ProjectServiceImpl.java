@@ -2,6 +2,8 @@ package com.orivex.project.service;
 
 import com.orivex.common.dto.PagedResponse;
 import java.util.List;
+import com.orivex.activity.enums.ActivityType;
+import com.orivex.activity.service.ActivityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +45,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
+    private final ActivityService activityService;
+
     @Override
     public ApiResponse<ProjectResponse> createProject(CreateProjectRequest request) {
 
@@ -76,6 +80,14 @@ public class ProjectServiceImpl implements ProjectService {
             logger.info("=================================================");
 
             Project savedProject = projectRepository.save(project);
+
+            activityService.logActivity(
+                            currentUser,
+                            ActivityType.PROJECT,
+                            "Project Created",
+                            "You created project \"" +
+                                            savedProject.getTitle() +
+                                            "\".");
 
             logger.info("Project created successfully. Project ID: {}",
                             savedProject.getId());
@@ -145,7 +157,7 @@ public class ProjectServiceImpl implements ProjectService {
                             size,
                             sort);
 
-            Specification<Project> specification = Specification.where(null);
+            Specification<Project> specification = Specification.where(ProjectSpecification.isNotDeleted());
 
             if (status != null) {
 
@@ -189,6 +201,58 @@ public class ProjectServiceImpl implements ProjectService {
                             response,
                             "Projects fetched successfully.");
 
+    }
+
+    @Override
+    public ApiResponse<PagedResponse<ProjectResponse>> getOpenProjects(
+                    int page,
+                    int size,
+                    String keyword,
+                    Double minBudget) {
+
+            Pageable pageable = PageRequest.of(
+                            page,
+                            size,
+                            Sort.by("createdAt").descending());
+
+            Specification<Project> specification = Specification
+                            .where(ProjectSpecification.isOpen())
+                            .and(ProjectSpecification.isNotDeleted());
+
+            if (keyword != null && !keyword.isBlank()) {
+
+                    specification = specification.and(
+                                    ProjectSpecification.titleContains(keyword));
+
+            }
+
+            if (minBudget != null) {
+
+                    specification = specification.and(
+                                    ProjectSpecification.hasMinimumBudget(minBudget));
+
+            }
+
+            Page<Project> projects = projectRepository.findAll(
+                            specification,
+                            pageable);
+
+            Page<ProjectResponse> projectPage = projects.map(
+                            projectMapper::toResponse);
+
+            PagedResponse<ProjectResponse> response = PagedResponse.<ProjectResponse>builder()
+                            .content(projectPage.getContent())
+                            .page(projectPage.getNumber())
+                            .size(projectPage.getSize())
+                            .totalItems(projectPage.getTotalElements())
+                            .totalPages(projectPage.getTotalPages())
+                            .hasNext(projectPage.hasNext())
+                            .hasPrevious(projectPage.hasPrevious())
+                            .build();
+
+            return ApiResponse.success(
+                            response,
+                            "Open projects fetched successfully.");
     }
 
     @Override
@@ -286,7 +350,10 @@ public ApiResponse<Void> deleteProject(Long id) {
                                 "You are not allowed to delete this project.");
         }
 
-        projectRepository.delete(project);
+        project.setStatus(ProjectStatus.DELETED);
+
+        projectRepository.save(project);
+
 
         return ApiResponse.success(
                         null,
@@ -321,6 +388,14 @@ public ApiResponse<ProjectResponse> closeProject(Long id) {
         project.setStatus(ProjectStatus.CANCELLED);
 
         Project savedProject = projectRepository.save(project);
+
+        activityService.logActivity(
+                        currentUser,
+                        ActivityType.PROJECT,
+                        "Project Closed",
+                        "Project \"" +
+                                        project.getTitle() +
+                                        "\" has been closed.");
 
         return ApiResponse.success(
                         projectMapper.toResponse(savedProject),

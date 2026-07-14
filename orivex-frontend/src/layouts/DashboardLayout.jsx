@@ -1,20 +1,63 @@
 import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
 
 import Sidebar from "@/components/common/Sidebar/Sidebar";
 import Topbar from "@/components/common/Topbar/Topbar";
 
-function DashboardLayout() {
-  return (
-    <div className="flex min-h-screen bg-slate-950">
-      <Sidebar />
+import {
+  connectSocket,
+  disconnectSocket,
+} from "@/features/chat/websocket/socketManager";
 
-      <div className="flex flex-1 flex-col">
+function DashboardLayout() {
+
+  useEffect(() => {
+
+    console.log("DashboardLayout Mounted");
+
+    connectSocket();
+
+    return () => {
+
+        console.log("DashboardLayout Unmounted");
+
+        disconnectSocket();
+
+    };
+
+}, []);
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-slate-950">
+
+      {/* Sidebar */}
+
+      <div className="sticky top-0 h-screen flex-shrink-0">
+        <Sidebar />
+      </div>
+
+      {/* Right Section */}
+
+      <div className="flex flex-1 flex-col overflow-hidden">
+
+        {/* Topbar */}
+
         <Topbar />
 
-        <main className="flex-1 p-6">
-          <Outlet />
+        {/* Page Content */}
+
+        <main className="flex-1 overflow-y-auto bg-slate-950">
+
+          <div className="mx-auto w-full max-w-7xl px-8 py-8">
+
+            <Outlet />
+
+          </div>
+
         </main>
+
       </div>
+
     </div>
   );
 }

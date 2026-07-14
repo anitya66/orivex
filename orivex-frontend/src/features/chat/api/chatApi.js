@@ -40,3 +40,15 @@ export async function sendMessage(
 
   return data;
 }
+
+export async function getConversationByFreelancer(
+    freelancerId
+) {
+
+    const { data } = await api.get(
+        `/conversations/freelancer/${freelancerId}`
+    );
+
+    return data;
+
+}

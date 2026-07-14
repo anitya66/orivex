@@ -24,13 +24,12 @@ function BrowseProjectsPage() {
   }
 }, [searchParams]);
 
-  const [status, setStatus] = useState("OPEN");
+  
 
   const { data, isLoading, error } = useProjects({
     page,
     size: 6,
     keyword: search || undefined,
-    status: status || undefined,
     direction: "desc",
     sortBy: "createdAt",
   });
@@ -58,17 +57,30 @@ function BrowseProjectsPage() {
 
       {/* Header */}
 
-      <div>
+<div className="rounded-3xl border border-slate-800 bg-gradient-to-r from-blue-600/20 via-slate-900 to-slate-900 p-8">
 
-        <h1 className="text-4xl font-bold text-white">
-          Browse Projects
-        </h1>
+  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
-        <p className="mt-2 text-slate-400">
-          Discover projects posted by clients.
-        </p>
+    <div>
 
-      </div>
+      <span className="rounded-full bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-400">
+        🚀 Freelance Marketplace
+      </span>
+
+      <h1 className="mt-5 text-4xl font-bold text-white lg:text-5xl">
+        Browse Projects
+      </h1>
+
+      <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-400">
+        Explore opportunities that match your skills, submit proposals,
+        and grow your freelance career with ORIVEX.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
 
       {/* Search & Filter */}
 
@@ -79,10 +91,7 @@ function BrowseProjectsPage() {
           onChange={setSearch}
         />
 
-        <ProjectFilters
-          status={status}
-          setStatus={setStatus}
-        />
+        
 
       </div>
 

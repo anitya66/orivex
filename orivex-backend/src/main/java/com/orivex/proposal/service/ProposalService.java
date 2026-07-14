@@ -20,6 +20,7 @@ public interface ProposalService {
             Long proposalId);
 
     ApiResponse<ProposalResponse> rejectProposal(
-            Long id);        
+                    Long id);
 
+    ApiResponse<ProposalResponse> withdrawProposal(Long proposalId);        
 }

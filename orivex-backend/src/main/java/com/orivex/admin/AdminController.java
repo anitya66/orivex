@@ -1,5 +1,6 @@
 package com.orivex.admin;
 
+import com.orivex.admin.dto.ContractDetailsResponse;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,11 +10,12 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.orivex.contract.enums.ContractStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import jakarta.validation.Valid;
 import com.orivex.project.enums.ProjectStatus;
+import com.orivex.admin.dto.ContractDetailsResponse;
 import com.orivex.admin.dto.DashboardResponse;
 import com.orivex.admin.dto.ProjectDetailsResponse;
 import com.orivex.admin.dto.UpdateProjectStatusRequest;
@@ -166,6 +168,46 @@ public ApiResponse<Void> deleteProject(
         @PathVariable Long projectId) {
 
     return adminService.deleteProject(projectId);
+
+}
+
+@GetMapping("/api/v1/admin/contracts")
+@PreAuthorize("hasRole('ADMIN')")
+public ApiResponse<?> getContracts(
+
+        @RequestParam(required = false) String keyword,
+
+        @RequestParam(required = false) ContractStatus status,
+
+        @RequestParam(defaultValue = "0") int page,
+
+        @RequestParam(defaultValue = "10") int size
+
+) {
+
+    Pageable pageable = PageRequest.of(page, size);
+
+    return adminService.getContracts(
+
+            keyword,
+
+            status,
+
+            pageable
+
+    );
+
+}
+
+@GetMapping("/api/v1/admin/contracts/{contractId}")
+@PreAuthorize("hasRole('ADMIN')")
+public ApiResponse<ContractDetailsResponse> getContractDetails(
+
+        @PathVariable Long contractId
+
+) {
+
+    return adminService.getContractDetails(contractId);
 
 }
 

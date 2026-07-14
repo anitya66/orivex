@@ -10,11 +10,10 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
-import ConfirmActionModal from "@/components/ui/ConfirmActionModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLogoutModal } from "@/contexts/LogoutModalContext";
 
 const clientMenus = [
   {
@@ -31,11 +30,6 @@ const clientMenus = [
     name: "Contracts",
     path: "/dashboard/contracts",
     icon: FileText,
-  },
-  {
-    name: "Bids",
-    path: "/bids",
-    icon: Gavel,
   },
   {
     name: "Chat",
@@ -136,15 +130,9 @@ const adminMenus = [
 ];
 
 function Sidebar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
-  const navigate = useNavigate();
-
-  const [logoutModalOpen, setLogoutModalOpen] =
-    useState(false);
-
-  const [logoutLoading, setLogoutLoading] =
-    useState(false);
+  const { setOpen } = useLogoutModal();
 
   const menus =
     user?.role === "CLIENT"
@@ -153,31 +141,45 @@ function Sidebar() {
       ? freelancerMenus
       : adminMenus;
 
-  async function handleLogout() {
-  setLogoutLoading(true);
-
-  try {
-    logout();
-
-    setLogoutModalOpen(false);
-
-    // Hard redirect
-    window.location.href = "/";
-  } finally {
-    setLogoutLoading(false);
-  }
-}
-
   return (
-    <>
-      <aside className="flex h-screen w-64 flex-col border-r border-slate-800 bg-slate-900">
-        <div className="border-b border-slate-800 p-6">
-          <h1 className="text-2xl font-bold text-blue-500">
-            ORIVEX
-          </h1>
+    <aside className="flex h-screen w-72 flex-col border-r border-slate-800 bg-slate-950">
+
+      {/* Logo */}
+
+      <div className="border-b border-slate-800 px-6 py-7">
+
+        <div className="flex items-center gap-3">
+
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-xl font-bold text-white shadow-lg shadow-blue-500/30">
+            O
+          </div>
+
+          <div>
+
+            <h1 className="text-xl font-bold tracking-wide text-white">
+              ORIVEX
+            </h1>
+
+            <p className="text-xs tracking-wide text-slate-400">
+              Premium Marketplace
+            </p>
+
+          </div>
+
         </div>
 
-        <nav className="flex-1 space-y-2 p-4">
+      </div>
+
+      {/* Navigation */}
+
+      <nav className="flex-1 overflow-y-auto px-4 py-6">
+
+        <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+          Navigation
+        </p>
+
+        <div className="space-y-2">
+
           {menus.map((item) => {
             const Icon = item.icon;
 
@@ -186,57 +188,79 @@ function Sidebar() {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
+                  `group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                      : "text-slate-400 hover:bg-slate-900 hover:text-white"
                   }`
                 }
               >
-                <Icon size={20} />
-                {item.name}
+                <Icon
+                  size={20}
+                  className="transition-transform duration-200 group-hover:scale-110"
+                />
+
+                <span>{item.name}</span>
               </NavLink>
             );
           })}
-        </nav>
 
-        <div className="border-t border-slate-800 p-4">
-          <div className="mb-4 rounded-xl bg-slate-800 p-4">
-            <p className="font-semibold text-white">
-              {user?.name}
-            </p>
+        </div>
 
-            <p className="text-sm text-slate-400">
-              {user?.role}
-            </p>
+      </nav>
+
+      {/* Bottom */}
+
+      <div className="border-t border-slate-800 p-5">
+
+        <p className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+          Account
+        </p>
+
+        <div className="mb-5 rounded-2xl border border-slate-800 bg-slate-900 p-4">
+
+          <div className="flex items-center gap-3">
+
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 font-bold text-white">
+
+              {user?.name?.charAt(0)?.toUpperCase()}
+
+            </div>
+
+            <div className="min-w-0 flex-1">
+
+              <p className="truncate font-semibold text-white">
+                {user?.name}
+              </p>
+
+              <div className="mt-1 flex items-center gap-2">
+
+                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+
+                <p className="truncate text-xs uppercase tracking-wider text-slate-400">
+                  {user?.role}
+                </p>
+
+              </div>
+
+            </div>
+
           </div>
 
-          <button
-            onClick={() =>
-              setLogoutModalOpen(true)
-            }
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-3 font-medium text-white transition hover:bg-red-600"
-          >
-            <LogOut size={18} />
-            Logout
-          </button>
         </div>
-      </aside>
 
-      {logoutModalOpen && (
-        <ConfirmActionModal
-          title="Are you sure you want to logout?"
-          message="You will need to sign in again to access your dashboard."
-          confirmText="Logout"
-          loadingText="Logging out..."
-          loading={logoutLoading}
-          onConfirm={handleLogout}
-          onClose={() =>
-            setLogoutModalOpen(false)
-          }
-        />
-      )}
-    </>
+        <button
+          onClick={() => setOpen(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 font-medium text-red-400 transition-all duration-200 hover:bg-red-500 hover:text-white"
+        >
+          <LogOut size={18} />
+
+          Logout
+        </button>
+
+      </div>
+
+    </aside>
   );
 }
 

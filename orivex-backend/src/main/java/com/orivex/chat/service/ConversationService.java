@@ -13,6 +13,9 @@ public interface ConversationService {
 
     List<ConversationResponse> getMyConversations();
 
-    
+    // ================= NEW =================
+
+    Long getConversationIdByFreelancer(
+            Long freelancerId);
 
 }

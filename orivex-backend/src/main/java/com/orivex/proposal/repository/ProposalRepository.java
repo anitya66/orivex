@@ -39,6 +39,7 @@ public interface ProposalRepository
     long countByFreelancerAndStatus(
                     FreelancerProfile freelancer,
                     ProposalStatus status);
-                    
+    
+    List<Proposal> findTop5ByOrderByCreatedAtDesc();                
                     
 }

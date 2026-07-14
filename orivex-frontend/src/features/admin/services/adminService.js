@@ -192,3 +192,56 @@ export async function getRecentActivities() {
   return data;
 
 }
+
+export async function getContracts({
+
+  page = 0,
+
+  size = 10,
+
+  keyword = "",
+
+  status = "",
+
+} = {}) {
+
+  const params = {
+
+    page,
+
+    size,
+
+  };
+
+  if (keyword) {
+    params.keyword = keyword;
+  }
+
+  if (status) {
+    params.status = status;
+  }
+
+  const { data } = await api.get(
+
+    "/admin/contracts",
+
+    {
+      params,
+    }
+
+  );
+
+  return data;
+}
+
+export async function getContractDetails(contractId) {
+
+  const { data } = await api.get(
+
+    `/admin/contracts/${contractId}`
+
+  );
+
+  return data;
+
+}

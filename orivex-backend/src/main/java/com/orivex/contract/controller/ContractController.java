@@ -76,4 +76,12 @@ public class ContractController {
 
     }
 
+    @PutMapping("/{contractId}/cancel")
+    public ApiResponse<String> cancelContract(
+            @PathVariable Long contractId) {
+
+        return contractService.cancelContract(contractId);
+
+    }
+
 }

@@ -40,89 +40,126 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public ApiResponse<ClientDashboardResponse> getClientDashboard() {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+            User currentUser = authenticationFacade.getCurrentUser();
 
-        ClientProfile client = clientProfileRepository
-                .findByUser(currentUser)
-                .orElseThrow(() -> new RuntimeException("Client profile not found"));
+            var clientProfile = clientProfileRepository.findByUser(currentUser);
 
-        long totalProjects = projectRepository.countByClient(client);
+            // User has not created a client profile yet
+            if (clientProfile.isEmpty()) {
 
-        long openProjects = projectRepository.countByClientAndStatus(
-                client,
-                com.orivex.project.enums.ProjectStatus.OPEN);
+                    ClientDashboardResponse response = ClientDashboardResponse.builder()
+                                    .profileCompleted(false)
+                                    .totalProjects(0L)
+                                    .openProjects(0L)
+                                    .closedProjects(0L)
+                                    .activeContracts(0L)
+                                    .completedContracts(0L)
+                                    .pendingProposals(0L)
+                                    .build();
 
-        long closedProjects = projectRepository.countByClientAndStatus(
-                client,
-                com.orivex.project.enums.ProjectStatus.CANCELLED);
+                    return ApiResponse.success(
+                                    response,
+                                    "Complete your profile to unlock all marketplace features.");
+            }
 
-        long activeContracts = contractRepository.countByClientAndStatus(
-                client,
-                com.orivex.contract.enums.ContractStatus.ACTIVE);
+            ClientProfile client = clientProfile.get();
 
-        long completedContracts = contractRepository.countByClientAndStatus(
-                client,
-                com.orivex.contract.enums.ContractStatus.COMPLETED);
+            long totalProjects = projectRepository.countByClient(client);
 
-        long pendingProposals = projectRepository.findByClient(client)
-                .stream()
-                .mapToLong(project -> proposalRepository.countByProjectAndStatus(
-                        project,
-                        com.orivex.proposal.enums.ProposalStatus.PENDING))
-                .sum();
+            long openProjects = projectRepository.countByClientAndStatus(
+                            client,
+                            com.orivex.project.enums.ProjectStatus.OPEN);
 
-        ClientDashboardResponse response = ClientDashboardResponse.builder()
-                .totalProjects(totalProjects)
-                .openProjects(openProjects)
-                .closedProjects(closedProjects)
-                .activeContracts(activeContracts)
-                .completedContracts(completedContracts)
-                .pendingProposals(pendingProposals)
-                .build();
+            long closedProjects = projectRepository.countByClientAndStatus(
+                            client,
+                            com.orivex.project.enums.ProjectStatus.CANCELLED);
 
-        return ApiResponse.success(
-                response,
-                "Client dashboard fetched successfully.");
+            long activeContracts = contractRepository.countByClientAndStatus(
+                            client,
+                            com.orivex.contract.enums.ContractStatus.ACTIVE);
+
+            long completedContracts = contractRepository.countByClientAndStatus(
+                            client,
+                            com.orivex.contract.enums.ContractStatus.COMPLETED);
+
+            long pendingProposals = projectRepository.findByClient(client)
+                            .stream()
+                            .mapToLong(project -> proposalRepository.countByProjectAndStatus(
+                                            project,
+                                            com.orivex.proposal.enums.ProposalStatus.PENDING))
+                            .sum();
+
+            ClientDashboardResponse response = ClientDashboardResponse.builder()
+                            .profileCompleted(true)
+                            .totalProjects(totalProjects)
+                            .openProjects(openProjects)
+                            .closedProjects(closedProjects)
+                            .activeContracts(activeContracts)
+                            .completedContracts(completedContracts)
+                            .pendingProposals(pendingProposals)
+                            .build();
+
+            return ApiResponse.success(
+                            response,
+                            "Client dashboard fetched successfully.");
     }
 
     @Override
     public ApiResponse<FreelancerDashboardResponse> getFreelancerDashboard() {
 
-        User currentUser = authenticationFacade.getCurrentUser();
+            User currentUser = authenticationFacade.getCurrentUser();
 
-        FreelancerProfile freelancer = freelancerProfileRepository
-                .findByUser(currentUser)
-                .orElseThrow(() -> new RuntimeException("Freelancer profile not found"));
+            var freelancerProfile = freelancerProfileRepository.findByUser(currentUser);
 
-        long totalApplications = proposalRepository.countByFreelancer(freelancer);
+            // User has not created a freelancer profile yet
+            if (freelancerProfile.isEmpty()) {
 
-        long acceptedProposals = proposalRepository.countByFreelancerAndStatus(
-                freelancer,
-                com.orivex.proposal.enums.ProposalStatus.ACCEPTED);
+                    FreelancerDashboardResponse response = FreelancerDashboardResponse.builder()
+                                    .profileCompleted(false)
+                                    .totalApplications(0L)
+                                    .acceptedProposals(0L)
+                                    .rejectedProposals(0L)
+                                    .activeContracts(0L)
+                                    .completedContracts(0L)
+                                    .build();
 
-        long rejectedProposals = proposalRepository.countByFreelancerAndStatus(
-                freelancer,
-                com.orivex.proposal.enums.ProposalStatus.REJECTED);
+                    return ApiResponse.success(
+                                    response,
+                                    "Complete your profile to unlock all marketplace features.");
+            }
 
-        long activeContracts = contractRepository.countByFreelancerAndStatus(
-                freelancer,
-                com.orivex.contract.enums.ContractStatus.ACTIVE);
+            FreelancerProfile freelancer = freelancerProfile.get();
 
-        long completedContracts = contractRepository.countByFreelancerAndStatus(
-                freelancer,
-                com.orivex.contract.enums.ContractStatus.COMPLETED);
+            long totalApplications = proposalRepository.countByFreelancer(freelancer);
 
-        FreelancerDashboardResponse response = FreelancerDashboardResponse.builder()
-                .totalApplications(totalApplications)
-                .acceptedProposals(acceptedProposals)
-                .rejectedProposals(rejectedProposals)
-                .activeContracts(activeContracts)
-                .completedContracts(completedContracts)
-                .build();
+            long acceptedProposals = proposalRepository.countByFreelancerAndStatus(
+                            freelancer,
+                            com.orivex.proposal.enums.ProposalStatus.ACCEPTED);
 
-        return ApiResponse.success(
-                response,
-                "Freelancer dashboard fetched successfully.");
+            long rejectedProposals = proposalRepository.countByFreelancerAndStatus(
+                            freelancer,
+                            com.orivex.proposal.enums.ProposalStatus.REJECTED);
+
+            long activeContracts = contractRepository.countByFreelancerAndStatus(
+                            freelancer,
+                            com.orivex.contract.enums.ContractStatus.ACTIVE);
+
+            long completedContracts = contractRepository.countByFreelancerAndStatus(
+                            freelancer,
+                            com.orivex.contract.enums.ContractStatus.COMPLETED);
+
+            FreelancerDashboardResponse response = FreelancerDashboardResponse.builder()
+                            .profileCompleted(true)
+                            .totalApplications(totalApplications)
+                            .acceptedProposals(acceptedProposals)
+                            .rejectedProposals(rejectedProposals)
+                            .activeContracts(activeContracts)
+                            .completedContracts(completedContracts)
+                            .build();
+
+            return ApiResponse.success(
+                            response,
+                            "Freelancer dashboard fetched successfully.");
     }
 
     @Override

@@ -1,3 +1,43 @@
+import {
+  User,
+  Briefcase,
+  IndianRupee,
+  Code2,
+  FileText,
+  Globe,
+  Building2,
+  FileBadge,
+} from "lucide-react";
+
+function Card({
+  icon: Icon,
+  title,
+  value,
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-slate-950 p-6 transition hover:border-blue-500/40">
+
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10">
+
+        <Icon
+          size={22}
+          className="text-blue-400"
+        />
+
+      </div>
+
+      <p className="text-sm uppercase tracking-wider text-slate-500">
+        {title}
+      </p>
+
+      <p className="mt-3 whitespace-pre-wrap break-words text-slate-300 leading-7">
+        {value || "-"}
+      </p>
+
+    </div>
+  );
+}
+
 function ProfileInfoCard({
   user,
   profile,
@@ -6,115 +46,85 @@ function ProfileInfoCard({
     user?.role === "FREELANCER";
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8">
+    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
 
-      <h2 className="mb-8 text-2xl font-bold text-white">
+      <h2 className="mb-8 text-3xl font-bold text-white">
         Profile Information
       </h2>
 
       {isFreelancer ? (
 
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
 
-          <div>
+          <Card
+            icon={User}
+            title="Bio"
+            value={profile.bio}
+          />
 
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Bio
-            </h3>
+          <Card
+            icon={Code2}
+            title="Skills"
+            value={profile.skills}
+          />
 
-            <p className="text-slate-300">
-              {profile.bio || "-"}
-            </p>
+          <Card
+            icon={IndianRupee}
+            title="Hourly Rate"
+            value={
+              profile.hourlyRate
+                ? `₹${profile.hourlyRate}/hr`
+                : "-"
+            }
+          />
 
-          </div>
+          <Card
+            icon={Briefcase}
+            title="Experience"
+            value={profile.experienceYears}
+          />
 
-          <div>
+          <Card
+            icon={Globe}
+            title="Portfolio"
+            value={profile.portfolioUrl}
+          />
 
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Skills
-            </h3>
-
-            <p className="text-slate-300">
-              {profile.skills || "-"}
-            </p>
-
-          </div>
-
-          <div>
-
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Hourly Rate
-            </h3>
-
-            <p className="text-slate-300">
-              ₹{profile.hourlyRate}/hr
-            </p>
-
-          </div>
-
-          <div>
-
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Experience
-            </h3>
-
-            <p className="text-slate-300">
-              {profile.experienceYears ?? "-"}
-            </p>
-
-          </div>
-
-          <div>
-
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Portfolio
-            </h3>
-
-            <p className="text-slate-300">
-              {profile.portfolioUrl || "-"}
-            </p>
-
-          </div>
-
-          <div>
-
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Resume
-            </h3>
-
-            <p className="text-slate-300">
-              {profile.resumeUrl || "Not uploaded"}
-            </p>
-
-          </div>
+          <Card
+            icon={FileText}
+            title="Resume"
+            value={
+              profile.resumeUrl
+                ? "Uploaded"
+                : "Not Uploaded"
+            }
+          />
 
         </div>
 
       ) : (
 
-        <div className="space-y-8">
+        <div className="grid gap-6 md:grid-cols-2">
 
-          <div>
+          <Card
+            icon={Building2}
+            title="Company Name"
+            value={profile.companyName}
+          />
 
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Company Description
-            </h3>
+          <Card
+            icon={Globe}
+            title="Website"
+            value={profile.website}
+          />
 
-            <p className="text-slate-300">
-              {profile.companyDescription || "-"}
-            </p>
+          <div className="md:col-span-2">
 
-          </div>
-
-          <div>
-
-            <h3 className="mb-2 font-semibold text-blue-400">
-              Website
-            </h3>
-
-            <p className="text-slate-300">
-              {profile.website || "-"}
-            </p>
+            <Card
+              icon={FileBadge}
+              title="Company Description"
+              value={profile.companyDescription}
+            />
 
           </div>
 

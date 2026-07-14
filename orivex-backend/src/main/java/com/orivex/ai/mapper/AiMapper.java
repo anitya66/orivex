@@ -20,6 +20,21 @@ public class AiMapper {
 
                 .freelancerName(freelancer.getUser().getName())
 
+                .headline(freelancer.getHeadline())
+
+                .skills(freelancer.getSkills())
+
+                .hourlyRate(
+                        freelancer.getHourlyRate() == null
+                                ? null
+                                : freelancer.getHourlyRate().doubleValue())
+
+                .experienceYears(
+                        freelancer.getExperienceYears())
+
+                .profileImage(
+                        freelancer.getProfileImage())
+
                 .overallScore(score.getOverallScore())
 
                 .skillScore(score.getSkillScore())
@@ -28,9 +43,13 @@ public class AiMapper {
 
                 .availabilityScore(score.getAvailabilityScore())
 
-                .ratingScore(averageRating == null ? 0.0 : averageRating)
+                .ratingScore(
+                        averageRating == null
+                                ? 0.0
+                                : averageRating)
 
-                .recommendation(getRecommendation(score.getOverallScore()))
+                .recommendation(
+                        getRecommendation(score.getOverallScore()))
 
                 .build();
     }
@@ -51,5 +70,4 @@ public class AiMapper {
 
         return "Low Match";
     }
-
 }

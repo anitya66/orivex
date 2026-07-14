@@ -63,12 +63,26 @@ public ApiResponse<String> uploadProfileImage(
 
 }
 
+@DeleteMapping("/profile-image")
+public ApiResponse<String> removeProfileImage() {
+
+    return freelancerProfileService.removeProfileImage();
+
+}
+
 @PostMapping(value = "/resume", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 public ApiResponse<String> uploadResume(
         @RequestPart("file") MultipartFile file) {
 
     return freelancerProfileService
             .uploadResume(file);
+
+}
+
+@DeleteMapping("/resume")
+public ApiResponse<String> removeResume() {
+
+    return freelancerProfileService.removeResume();
 
 }
 
