@@ -12,9 +12,7 @@ export function useSendMessage() {
 
     onSuccess: (_, variables) => {
 
-      queryClient.invalidateQueries({
-        queryKey: ["messages", variables.conversationId],
-      });
+     
 
       queryClient.invalidateQueries({
         queryKey: ["conversations"],

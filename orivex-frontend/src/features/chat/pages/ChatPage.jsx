@@ -8,6 +8,11 @@ import {
 } from "react-router-dom";
 
 import {
+  subscribeConversation,
+  unsubscribe,
+} from "../websocket/websocket";
+
+import {
   MessageCircle,
   Search,
   Menu,
@@ -23,7 +28,7 @@ import { useConversations } from "../hooks/useConversations";
 import { useMessages } from "../hooks/useMessages";
 import { useSendMessage } from "../hooks/useSendMessage";
 
-import { subscribeConversation } from "../websocket/websocket";
+
 
 function ChatPage() {
 
@@ -112,15 +117,17 @@ function ChatPage() {
 
   }, [selectedConversation]);
 
-  const {
-    data: fetchedMessages = [],
-    isLoading: loadingMessages,
-  } = useMessages(
-    selectedConversation?.id
-  );
+  
 
-  const [messages, setMessages] =
-    useState([]);
+  const {
+  data: fetchedMessages = [],
+  isLoading: loadingMessages,
+} = useMessages(selectedConversation?.id);
+
+  console.log("Fetched Messages =>", fetchedMessages);
+  
+  const [messages, setMessages] = useState([]);
+  console.log("Selected Conversation =>", selectedConversation);
 
   const {
     mutate: sendMessage,
@@ -128,40 +135,54 @@ function ChatPage() {
   } = useSendMessage();
 
   useEffect(() => {
+     
+    if (!selectedConversation) {
 
-    setMessages(fetchedMessages);
+        setMessages([]);
 
-  }, [fetchedMessages]);
+        return;
 
-  useEffect(() => {
+    }
+
+    if (Array.isArray(fetchedMessages)) {
+
+        setMessages(fetchedMessages);
+
+    }
+
+}, [selectedConversation?.id]);
+
+useEffect(() => {
 
     if (!selectedConversation) return;
 
+    const destination =
+      `/topic/conversations/${selectedConversation.id}`;
+
     subscribeConversation(
-      selectedConversation.id,
-      (newMessage) => {
+        selectedConversation.id,
+        (newMessage)=>{
 
-        setMessages(prev => {
+            setMessages(prev=>{
 
-          if (
-            prev.some(
-              m => m.id === newMessage.id
-            )
-          ) {
-            return prev;
-          }
+                if(prev.some(m=>m.id===newMessage.id)){
+                    return prev;
+                }
 
-          return [
-            ...prev,
-            newMessage,
-          ];
+                return [...prev,newMessage];
 
-        });
+            });
 
-      }
+        }
     );
 
-  }, [selectedConversation?.id]);
+    return ()=>{
+
+        unsubscribe(destination);
+
+    };
+
+},[selectedConversation?.id]);
 
   function handleSend(message) {
 

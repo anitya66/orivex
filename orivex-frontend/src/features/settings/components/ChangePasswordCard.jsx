@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
 
 
 import { changePassword } from "../services/settingsService";

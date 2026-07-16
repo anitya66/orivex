@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
-
+import {
+  X,
+  User,
+  FileText,
+  Briefcase,
+  IndianRupee,
+  Globe,
+  Building2,
+} from "lucide-react";
 import { useUpdateClientProfile } from "../hooks/useUpdateClientProfile";
 import { useUpdateFreelancerProfile } from "../hooks/useUpdateFreelancerProfile";
 

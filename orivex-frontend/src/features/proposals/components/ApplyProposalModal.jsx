@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
-
+import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
 import { proposalSchema } from "../validation/proposalSchema";

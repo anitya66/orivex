@@ -27,26 +27,26 @@ function ProposalCard({ proposal }) {
   } = useRejectProposal();
 
   function refreshQueries() {
-    queryClient.refetchQueries({
-      queryKey: ["project-proposals", proposal.projectId],
-    });
+  queryClient.invalidateQueries({
+    queryKey: ["project-proposals", proposal.projectId],
+  });
 
-    queryClient.refetchQueries({
-      queryKey: ["project", proposal.projectId],
-    });
+  queryClient.invalidateQueries({
+    queryKey: ["project", proposal.projectId],
+  });
 
-    queryClient.refetchQueries({
-      queryKey: ["my-proposals"],
-    });
+  queryClient.invalidateQueries({
+    queryKey: ["my-proposals"],
+  });
 
-    queryClient.refetchQueries({
-      queryKey: ["my-contracts"],
-    });
+  queryClient.invalidateQueries({
+    queryKey: ["my-contracts"],
+  });
 
-    queryClient.refetchQueries({
-      queryKey: ["client-contracts"],
-    });
-  }
+  queryClient.invalidateQueries({
+    queryKey: ["client-contracts"],
+  });
+}
 
   function handleAccept() {
     acceptProposal(proposal.id, {

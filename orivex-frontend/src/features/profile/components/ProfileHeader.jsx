@@ -21,6 +21,15 @@ function ProfileHeader({
     ? profile?.profileImage
     : profile?.companyLogo;
 
+  // Backend Base URL
+  const API_BASE =
+    import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "");
+
+  // Full Image URL
+  const imageUrl = image
+    ? `${API_BASE}${image}`
+    : null;
+
   return (
     <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950">
 
@@ -42,12 +51,16 @@ function ProfileHeader({
 
             <div className="relative flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-4 border-blue-500 bg-slate-800 shadow-2xl">
 
-              {image ? (
+              {imageUrl ? (
 
                 <img
-                  src={`http://localhost:8080${image}`}
+                  src={imageUrl}
                   alt="Profile"
                   className="h-full w-full object-cover"
+                  onError={(e) => {
+                    console.log("Image failed:", imageUrl);
+                    e.currentTarget.style.display = "none";
+                  }}
                 />
 
               ) : isFreelancer ? (
@@ -77,9 +90,7 @@ function ProfileHeader({
             <div className="flex flex-wrap items-center gap-4">
 
               <h1 className="text-5xl font-black text-white">
-
                 {profile?.name}
-
               </h1>
 
               <span
@@ -101,9 +112,7 @@ function ProfileHeader({
             </div>
 
             <p className="mt-3 text-lg text-slate-400">
-
               {profile?.email}
-
             </p>
 
             {isFreelancer ? (
@@ -111,15 +120,12 @@ function ProfileHeader({
               <>
 
                 <p className="mt-5 text-2xl font-semibold text-blue-400">
-
                   {profile?.headline || "Professional Freelancer"}
-
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-4">
 
                   {profile?.portfolioUrl && (
-
                     <a
                       href={profile.portfolioUrl}
                       target="_blank"
@@ -127,29 +133,23 @@ function ProfileHeader({
                       className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
                     >
                       <Briefcase size={18} />
-
                       Portfolio
                     </a>
-
                   )}
 
                   {profile?.githubUrl && (
-
                     <a
                       href={profile.githubUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-3 text-white transition hover:border-blue-500"
                     >
-                     <FaGithub size={18} />
-
+                      <FaGithub size={18} />
                       GitHub
                     </a>
-
                   )}
 
                   {profile?.linkedinUrl && (
-
                     <a
                       href={profile.linkedinUrl}
                       target="_blank"
@@ -157,10 +157,8 @@ function ProfileHeader({
                       className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-3 text-white transition hover:border-blue-500"
                     >
                       <FaLinkedin size={18} />
-
                       LinkedIn
                     </a>
-
                   )}
 
                 </div>
@@ -172,13 +170,10 @@ function ProfileHeader({
               <>
 
                 <p className="mt-5 text-2xl font-semibold text-blue-400">
-
                   {profile?.companyName || "Company"}
-
                 </p>
 
                 {profile?.website && (
-
                   <a
                     href={profile.website}
                     target="_blank"
@@ -186,10 +181,8 @@ function ProfileHeader({
                     className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
                   >
                     <Globe size={18} />
-
                     Visit Website
                   </a>
-
                 )}
 
               </>
@@ -205,17 +198,13 @@ function ProfileHeader({
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 text-center">
 
               <h3 className="text-3xl font-black text-blue-400">
-
                 {isFreelancer
                   ? profile?.experienceYears ?? 0
                   : "-"}
-
               </h3>
 
               <p className="mt-2 text-sm text-slate-400">
-
                 Experience
-
               </p>
 
             </div>
@@ -223,17 +212,13 @@ function ProfileHeader({
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 text-center">
 
               <h3 className="text-3xl font-black text-cyan-400">
-
                 {isFreelancer
                   ? `₹${profile?.hourlyRate ?? 0}`
                   : "-"}
-
               </h3>
 
               <p className="mt-2 text-sm text-slate-400">
-
                 Hourly Rate
-
               </p>
 
             </div>
@@ -241,19 +226,15 @@ function ProfileHeader({
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 text-center">
 
               <h3 className="text-3xl font-black text-emerald-400">
-
                 {isFreelancer
                   ? profile?.skills
                     ? profile.skills.split(",").length
                     : 0
                   : "-"}
-
               </h3>
 
               <p className="mt-2 text-sm text-slate-400">
-
                 Skills
-
               </p>
 
             </div>

@@ -2,6 +2,7 @@ import {
   connectSocket,
   disconnectSocket,
   subscribe,
+  unsubscribe,
   publish,
 } from "./socketManager";
 
@@ -27,6 +28,8 @@ export function subscribeConversation(
     callback
   );
 }
+
+export { unsubscribe };
 
 /* ===============================
    Send Chat Message

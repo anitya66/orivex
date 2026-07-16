@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { toast } from "sonner";
+
 import {
   ExternalLink,
   X,
+  FileText,
+  Send,
 } from "lucide-react";
+
+import { FaGithub } from "react-icons/fa";
+
+
 
 function SubmitWorkModal({
   onSubmit,
@@ -78,7 +85,7 @@ function SubmitWorkModal({
 
             <label className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-slate-400">
 
-              <Github size={16} />
+              <FaGithub size={16} />
 
               Submission URL
 
