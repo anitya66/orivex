@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
 
-import Button from "@/components/ui/Button";
+
 import Input from "@/components/ui/Input";
 
 import { register as registerUser } from "../services/authService";
