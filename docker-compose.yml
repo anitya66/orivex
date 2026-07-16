@@ -1,0 +1,77 @@
+services:
+
+  mysql:
+    image: mysql:8.4
+    container_name: orivex-mysql
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MYSQL_DATABASE: orivex
+
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - orivex-network
+
+  backend:
+    build:
+      context: ./orivex-backend
+
+    container_name: orivex-backend
+    restart: unless-stopped
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    env_file:
+      - .env
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/orivex
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - ./orivex-backend/uploads:/app/uploads
+
+    networks:
+      - orivex-network
+
+  frontend:
+    build:
+      context: ./orivex-frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8080/api/v1
+        VITE_RAZORPAY_KEY: rzp_test_TCxmx9yBmHDcwn
+
+    container_name: orivex-frontend
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "3000:80"
+
+    networks:
+      - orivex-network
+
+volumes:
+  mysql_data:
+
+networks:
+  orivex-network:
+    driver: bridge

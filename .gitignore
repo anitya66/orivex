@@ -1,0 +1,25 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Uploads
+orivex-backend/uploads/
+uploads/
+
+# Logs
+*.log
+backend.log
+
+# Build
+node_modules/
+dist/
+target/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
