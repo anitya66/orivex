@@ -6,6 +6,10 @@ import {
 } from "react";
 
 import {
+  connectSocket,
+} from "@/features/chat/websocket/socketManager";
+
+import {
   subscribeIncomingCall,
 } from "../websocket/callSocket";
 
@@ -21,6 +25,8 @@ export function CallProvider({ children }) {
   const [callState, setCallState] = useState("IDLE");
 
   useEffect(() => {
+
+    connectSocket();
 
     console.log("📞 CallProvider Mounted");
 
