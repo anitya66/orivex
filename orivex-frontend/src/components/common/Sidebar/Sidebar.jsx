@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   Briefcase,
@@ -8,6 +9,7 @@ import {
   User,
   Settings,
   LogOut,
+  X,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -129,7 +131,10 @@ const adminMenus = [
   },
 ];
 
-function Sidebar() {
+function Sidebar({
+  open,
+  onClose,
+}) {
   const { user } = useAuth();
 
   const { setOpen } = useLogoutModal();
@@ -142,16 +147,35 @@ function Sidebar() {
       : adminMenus;
 
   return (
-    <aside className="flex h-screen w-72 flex-col border-r border-slate-800 bg-slate-950">
+    <aside
+      className={`
+        fixed inset-y-0 left-0 z-50
+        flex w-72 flex-col
+        border-r border-slate-800
+        bg-slate-950
+        transition-transform duration-300 ease-in-out
 
-      {/* Logo */}
+        ${
+          open
+            ? "translate-x-0"
+            : "-translate-x-full"
+        }
 
-      <div className="border-b border-slate-800 px-6 py-7">
+        lg:static
+        lg:translate-x-0
+        lg:flex-shrink-0
+      `}
+    >
+      {/* Header */}
+
+      <div className="flex items-center justify-between border-b border-slate-800 px-6 py-6 lg:justify-start">
 
         <div className="flex items-center gap-3">
 
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-xl font-bold text-white shadow-lg shadow-blue-500/30">
+
             O
+
           </div>
 
           <div>
@@ -168,6 +192,15 @@ function Sidebar() {
 
         </div>
 
+        {/* Close Button */}
+
+        <button
+          onClick={onClose}
+          className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-900 hover:text-white lg:hidden"
+        >
+          <X size={20} />
+        </button>
+
       </div>
 
       {/* Navigation */}
@@ -181,12 +214,15 @@ function Sidebar() {
         <div className="space-y-2">
 
           {menus.map((item) => {
+
             const Icon = item.icon;
 
             return (
+
               <NavLink
                 key={item.path}
                 to={item.path}
+                onClick={() => onClose?.()}
                 className={({ isActive }) =>
                   `group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                     isActive
@@ -201,21 +237,25 @@ function Sidebar() {
                 />
 
                 <span>{item.name}</span>
+
               </NavLink>
+
             );
+
           })}
 
         </div>
 
       </nav>
-
-      {/* Bottom */}
+          {/* Bottom */}
 
       <div className="border-t border-slate-800 p-5">
 
         <p className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
           Account
         </p>
+
+        {/* User Card */}
 
         <div className="mb-5 rounded-2xl border border-slate-800 bg-slate-900 p-4">
 
@@ -230,15 +270,19 @@ function Sidebar() {
             <div className="min-w-0 flex-1">
 
               <p className="truncate font-semibold text-white">
+
                 {user?.name}
+
               </p>
 
               <div className="mt-1 flex items-center gap-2">
 
-                <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
 
                 <p className="truncate text-xs uppercase tracking-wider text-slate-400">
+
                   {user?.role}
+
                 </p>
 
               </div>
@@ -249,19 +293,28 @@ function Sidebar() {
 
         </div>
 
+        {/* Logout */}
+
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            onClose?.();
+            setOpen(true);
+          }}
           className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 font-medium text-red-400 transition-all duration-200 hover:bg-red-500 hover:text-white"
         >
+
           <LogOut size={18} />
 
           Logout
+
         </button>
 
       </div>
 
     </aside>
+
   );
+
 }
 
 export default Sidebar;

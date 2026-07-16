@@ -57,132 +57,93 @@ function WhyChoose() {
   return (
     <section
       id="features"
-      className="relative overflow-hidden bg-slate-950 py-28"
+      className="relative overflow-hidden bg-slate-950 py-20 sm:py-24 lg:py-28"
     >
       {/* Background */}
 
       <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-blue-600/10 blur-[140px] sm:h-96 sm:w-96 sm:blur-[180px]" />
 
-        <div className="absolute left-0 top-0 h-96 w-96 rounded-full bg-blue-600/10 blur-[180px]" />
-
-        <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-cyan-500/10 blur-[180px]" />
-
+        <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-cyan-500/10 blur-[140px] sm:h-96 sm:w-96 sm:blur-[180px]" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         {/* Heading */}
 
         <div className="mx-auto max-w-4xl text-center">
-
-          <span className="inline-flex rounded-full border border-blue-500/20 bg-blue-500/10 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-blue-300">
-
+          <span className="inline-flex rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-blue-300 sm:px-5 sm:text-sm sm:tracking-[0.3em]">
             WHY CHOOSE ORIVEX
-
           </span>
 
-          <h2 className="mt-8 text-4xl font-black tracking-tight text-white md:text-5xl">
-
+          <h2 className="mt-6 text-3xl font-black tracking-tight text-white sm:mt-8 sm:text-4xl md:text-5xl">
             Everything You Need
             <br />
             In One Platform
-
           </h2>
 
-          <p className="mx-auto mt-7 max-w-3xl text-lg leading-9 text-slate-400">
-
-            ORIVEX combines AI, secure contracts, payments,
-            real-time communication and project management into one
-            modern freelance ecosystem built for professionals.
-
+          <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-400 sm:mt-7 sm:text-lg sm:leading-9">
+            ORIVEX combines AI, secure contracts, payments, real-time
+            communication and project management into one modern freelance
+            ecosystem built for professionals.
           </p>
-
         </div>
 
         {/* Cards */}
 
-        <div className="mt-20 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-
+        <div className="mt-14 grid gap-5 sm:mt-16 sm:gap-6 md:grid-cols-2 xl:mt-20 xl:grid-cols-3 xl:gap-8">
           {features.map((feature) => {
-
             const Icon = feature.icon;
 
             return (
-
               <div
                 key={feature.title}
-                className="group relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-8 transition-all duration-300 hover:-translate-y-3 hover:border-blue-500/40 hover:shadow-[0_25px_60px_rgba(37,99,235,0.18)]"
+                className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-6 transition-all duration-300 hover:-translate-y-3 hover:border-blue-500/40 hover:shadow-[0_25px_60px_rgba(37,99,235,0.18)] sm:rounded-3xl sm:p-8"
               >
-
                 {/* Glow */}
 
                 <div className="absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100">
-
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5" />
-
                 </div>
 
                 <div className="relative">
-
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-700 bg-slate-800/80 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-500/40">
-
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700 bg-slate-800/80 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-500/40 sm:h-16 sm:w-16">
                     <Icon
-                      size={30}
-                      className={`${feature.color} transition-transform duration-300 group-hover:rotate-6`}
+                      size={28}
+                      className={`${feature.color} transition-transform duration-300 group-hover:rotate-6 sm:h-[30px] sm:w-[30px]`}
                     />
-
                   </div>
 
-                  <h3 className="mt-8 text-2xl font-bold text-white">
-
+                  <h3 className="mt-6 text-xl font-bold text-white sm:mt-8 sm:text-2xl">
                     {feature.title}
-
                   </h3>
 
-                  <p className="mt-5 leading-8 text-slate-400">
-
+                  <p className="mt-4 text-sm leading-7 text-slate-400 sm:mt-5 sm:text-base sm:leading-8">
                     {feature.description}
-
                   </p>
 
-                  <div className="mt-8 flex items-center text-sm font-semibold text-blue-400 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
-
+                  <div className="mt-6 flex items-center text-sm font-semibold text-blue-400 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 sm:mt-8">
                     Learn More
 
                     <ArrowRight className="ml-2 h-4 w-4" />
-
                   </div>
-
                 </div>
-
               </div>
-
             );
-
           })}
-
         </div>
 
         {/* Bottom */}
 
-        <div className="mt-20 text-center">
-
-          <p className="text-lg text-slate-400">
-
+        <div className="mt-14 text-center sm:mt-20">
+          <p className="text-base text-slate-400 sm:text-lg">
             Trusted by startups, agencies and enterprises worldwide.
-
           </p>
 
-          <p className="mt-2 text-sm text-slate-500">
-
+          <p className="mt-2 text-xs text-slate-500 sm:text-sm">
             Build faster. Hire smarter. Scale confidently.
-
           </p>
-
         </div>
-
       </div>
-
     </section>
   );
 }

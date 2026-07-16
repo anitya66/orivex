@@ -56,7 +56,7 @@ function Hero() {
 
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl gap-20 px-6 py-20 lg:grid-cols-2 lg:items-center lg:px-8">
+      <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-6 sm:py-20 lg:gap-16 lg:px-8 lg:py-24 lg:grid-cols-2 lg:items-center">
 
         {/* LEFT */}
 
@@ -70,7 +70,7 @@ function Hero() {
 
           </span>
 
-          <h1 className="mt-8 max-w-[700px] text-5xl font-black leading-[1.05] tracking-[-0.03em] text-white lg:text-6xl xl:text-7xl">
+          <h1 className="mt-8 max-w-[700px] text-4xl font-black leading-tight tracking-[-0.03em] text-white sm:text-5xl lg:text-6xl xl:text-7xl">
 
             Hire Smarter.
 
@@ -84,7 +84,7 @@ function Hero() {
 
           </h1>
 
-          <p className="mt-8 max-w-2xl text-lg leading-9 text-slate-400 lg:text-xl">
+          <p className="mt-6 max-w-2xl text-base leading-8 text-slate-400 sm:text-lg lg:text-xl lg:leading-9">
 
             ORIVEX connects businesses with highly skilled freelancers,
             helping companies hire faster, collaborate seamlessly,
@@ -94,7 +94,7 @@ function Hero() {
 
           {/* CTA */}
 
-          <div className="mt-12 flex flex-col gap-5 sm:flex-row">
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
 
             <Button
               size="lg"
@@ -118,7 +118,7 @@ function Hero() {
 
           {/* Features */}
 
-          <div className="mt-14 grid gap-5 sm:grid-cols-2">
+          <div className="mt-12 grid gap-4 sm:grid-cols-2">
 
             {features.map((feature) => {
 
@@ -128,7 +128,7 @@ function Hero() {
 
                 <div
                   key={feature.text}
-                  className="group flex items-center gap-3 rounded-2xl border border-transparent bg-transparent px-4 py-4 transition-all duration-300 hover:border-slate-800 hover:bg-slate-900/50"
+                  className="group flex items-center gap-3 rounded-2xl border border-transparent bg-transparent px-3 py-3 sm:px-4 sm:py-4"
                 >
 
                   <Icon
@@ -151,7 +151,7 @@ function Hero() {
 
           {/* Hero Stats */}
 
-          <div className="mt-14">
+          <div className="mt-12">
 
             <HeroStats />
 
@@ -161,7 +161,7 @@ function Hero() {
 
         {/* RIGHT */}
 
-        <div className="relative transition-transform duration-500 lg:scale-105">
+        <div className="relative mx-auto w-full max-w-xl transition-transform duration-500 md:max-w-2xl lg:max-w-none lg:scale-105">
 
           <DashboardPreview />
 

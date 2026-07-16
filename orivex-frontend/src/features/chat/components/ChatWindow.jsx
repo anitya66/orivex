@@ -4,6 +4,7 @@ import {
   Phone,
   Video,
   MoreVertical,
+  ArrowLeft,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +24,7 @@ function ChatWindow({
   loadingMessages,
   onSend,
   sending,
+  onOpenSidebar,
 }) {
   const bottomRef = useRef(null);
 
@@ -71,15 +73,22 @@ function ChatWindow({
 
       {/* ================= HEADER ================= */}
 
-      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/70 px-7 py-5 backdrop-blur">
+      <div className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-800 bg-slate-900/95 px-4 py-4 backdrop-blur sm:px-6">
 
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+
+          <button
+  onClick={onOpenSidebar}
+  className="rounded-xl border border-slate-700 bg-slate-800 p-2 text-white lg:hidden"
+>
+  <ArrowLeft size={18} />
+</button>
 
           {/* Avatar */}
 
           <div className="relative">
 
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-lg font-bold text-white">
+            <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-lg font-bold text-white">
 
               {conversation.otherUserName
                 ?.split(" ")
@@ -99,11 +108,11 @@ function ChatWindow({
 
           <div>
 
-            <h2 className="text-xl font-bold text-white">
+            <h2 className="truncate text-lg font-bold text-white sm:text-xl">
               {conversation.otherUserName}
             </h2>
 
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 truncate text-sm text-slate-400">
               {conversation.projectTitle}
             </p>
 
@@ -117,7 +126,7 @@ function ChatWindow({
 
         {/* ================= ACTIONS ================= */}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
 
           {/* AUDIO */}
 
@@ -151,7 +160,7 @@ function ChatWindow({
 
       {/* ================= MESSAGES ================= */}
 
-      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-6">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6">
 
         {loadingMessages ? (
 
@@ -177,7 +186,7 @@ function ChatWindow({
 
       {/* ================= INPUT ================= */}
 
-      <div className="border-t border-slate-800 bg-slate-900">
+       <div className="sticky bottom-0 border-t border-slate-800 bg-slate-900">
 
         <MessageInput
           onSend={onSend}

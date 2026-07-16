@@ -15,19 +15,19 @@ const stats = [
 
 function HeroStats() {
   return (
-    <div className="mt-16 flex flex-wrap gap-12">
+    <div className="mt-12 flex flex-wrap justify-center gap-8 text-center sm:justify-start sm:text-left lg:gap-12">
 
       {stats.map((item) => (
 
         <div key={item.label}>
 
-          <h2 className="text-5xl font-black text-white">
+          <h2 className="text-4xl font-black text-white sm:text-5xl">
 
             {item.value}
 
           </h2>
 
-          <p className="mt-2 text-slate-400">
+          <p className="mt-2 text-sm text-slate-400 sm:text-base">
 
             {item.label}
 

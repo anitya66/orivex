@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { ArrowRight } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -55,22 +56,38 @@ function RegisterPage() {
   };
 
   return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-950 px-6">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-5 py-10 sm:px-6">
+      {/* Background */}
 
-        <h1 className="text-3xl font-bold text-white">
-          Create Account
-        </h1>
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -left-32 top-0 h-80 w-80 rounded-full bg-blue-600/10 blur-[160px]" />
 
-        <p className="mt-2 text-slate-400">
-          Join ORIVEX and start hiring or freelancing today.
-        </p>
+        <div className="absolute -right-32 bottom-0 h-80 w-80 rounded-full bg-cyan-500/10 blur-[160px]" />
+      </div>
+
+      {/* Card */}
+
+      <div className="relative w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-[0_30px_90px_rgba(37,99,235,0.18)] backdrop-blur-xl sm:p-8">
+        <div className="mb-8 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-2xl font-black text-white shadow-lg">
+            O
+          </div>
+
+          <h1 className="mt-6 text-3xl font-black text-white">
+            Create Account
+          </h1>
+
+          <p className="mt-2 text-sm text-slate-400 sm:text-base">
+            Join ORIVEX and start hiring or freelancing today.
+          </p>
+        </div>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="mt-8 space-y-5"
+          className="space-y-5"
         >
           {/* Name */}
+
           <div>
             <Input
               type="text"
@@ -79,13 +96,14 @@ function RegisterPage() {
             />
 
             {errors.name && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-2 text-sm text-red-500">
                 {errors.name.message}
               </p>
             )}
           </div>
 
           {/* Email */}
+
           <div>
             <Input
               type="email"
@@ -94,13 +112,14 @@ function RegisterPage() {
             />
 
             {errors.email && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-2 text-sm text-red-500">
                 {errors.email.message}
               </p>
             )}
           </div>
 
           {/* Password */}
+
           <div>
             <Input
               type="password"
@@ -109,13 +128,14 @@ function RegisterPage() {
             />
 
             {errors.password && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-2 text-sm text-red-500">
                 {errors.password.message}
               </p>
             )}
           </div>
 
           {/* Role */}
+
           <div>
             <label className="mb-2 block text-sm font-medium text-slate-300">
               Register As
@@ -123,7 +143,7 @@ function RegisterPage() {
 
             <select
               {...register("role")}
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             >
               <option value="CLIENT">
                 Client
@@ -135,7 +155,7 @@ function RegisterPage() {
             </select>
 
             {errors.role && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-2 text-sm text-red-500">
                 {errors.role.message}
               </p>
             )}
@@ -146,9 +166,15 @@ function RegisterPage() {
             className="w-full"
             disabled={loading}
           >
-            {loading
-              ? "Creating Account..."
-              : "Create Account"}
+            {loading ? (
+              "Creating Account..."
+            ) : (
+              <>
+                Create Account
+
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </>
+            )}
           </Button>
         </form>
 
@@ -156,15 +182,14 @@ function RegisterPage() {
           Already have an account?{" "}
           <Link
             to={ROUTES.LOGIN}
-            className="font-semibold text-blue-400 hover:text-blue-300"
+            className="font-semibold text-blue-400 transition hover:text-blue-300"
           >
             Sign In
           </Link>
         </p>
-
       </div>
     </div>
-      );
+  );
 }
 
 export default RegisterPage;

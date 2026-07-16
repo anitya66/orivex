@@ -27,7 +27,7 @@ function ConversationItem({
   return (
     <button
       onClick={() => onClick(conversation)}
-      className={`group relative w-full overflow-hidden rounded-3xl border p-5 text-left transition-all duration-300 ${
+      className={`group relative w-full overflow-hidden rounded-3xl border p-4 sm:p-5 text-left transition-all duration-300 ${
         selected
           ? "border-blue-500 bg-gradient-to-r from-blue-600/20 to-cyan-500/10 shadow-xl shadow-blue-500/10"
           : "border-slate-800 bg-slate-900 hover:-translate-y-1 hover:border-slate-700 hover:bg-slate-800"
@@ -45,7 +45,7 @@ function ConversationItem({
 
         <div className="relative shrink-0">
 
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-cyan-500 to-indigo-500 text-sm font-bold text-white shadow-lg">
+          <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-cyan-500 to-indigo-500 text-sm font-bold text-white shadow-lg">
 
             {initials}
 
@@ -66,7 +66,7 @@ function ConversationItem({
 
             <div className="min-w-0">
 
-              <h3 className="truncate text-base font-bold text-white">
+              <h3 className="truncate text-sm sm:text-base font-bold text-white">
 
                 {conversation.otherUserName}
 
@@ -99,7 +99,7 @@ function ConversationItem({
 
           </div>
 
-          <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-400">
+          <p className="mt-2 line-clamp-2 text-xs leading-5 sm:mt-3 sm:text-sm sm:leading-6 text-slate-400">
 
             {conversation.lastMessage ||
               "Start your conversation..."}
