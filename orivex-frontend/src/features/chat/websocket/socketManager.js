@@ -15,9 +15,17 @@ const pendingPublishes = [];
 ========================================= */
 
 function flushSubscriptions() {
+
+  console.log("========== FLUSH SUBSCRIPTIONS ==========");
+
   pendingSubscriptions.forEach((callback, destination) => {
+
+    console.log("Subscribing ->", destination);
+
     internalSubscribe(destination, callback);
+
   });
+
 }
 
 function flushPublishes() {
@@ -32,6 +40,9 @@ function flushPublishes() {
 }
 
 function internalSubscribe(destination, callback) {
+
+  console.log("internalSubscribe ->", destination);
+
   if (!stompClient?.connected) {
     return;
   }
@@ -43,11 +54,19 @@ function internalSubscribe(destination, callback) {
   const subscription = stompClient.subscribe(
     destination,
     (message) => {
+
+      console.log(
+        "MESSAGE RECEIVED FROM",
+        destination,
+        JSON.parse(message.body)
+      );
+
       callback(JSON.parse(message.body));
     }
   );
 
   subscriptions.set(destination, subscription);
+
 }
 
 /* =========================================
@@ -145,6 +164,9 @@ export function disconnectSocket() {
 ========================================= */
 
 export function subscribe(destination, callback) {
+
+  console.log("Pending Subscribe ->", destination);
+
   pendingSubscriptions.set(destination, callback);
 
   if (!stompClient?.connected) {
@@ -152,6 +174,7 @@ export function subscribe(destination, callback) {
   }
 
   internalSubscribe(destination, callback);
+
 }
 
 /* =========================================
