@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 
-
+import Button from "@/components/ui/Button";
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
