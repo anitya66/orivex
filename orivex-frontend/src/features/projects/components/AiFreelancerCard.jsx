@@ -499,79 +499,8 @@ function AiFreelancerCard({
 
 }
 
-/* ===============================
-   Small Stat Card
-=============================== */
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-}) {
 
-  return (
 
-    <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 text-center">
-
-      <Icon
-        size={20}
-        className="mx-auto text-blue-400"
-      />
-
-      <p className="mt-3 text-lg font-bold break-words text-white">
-        {value}
-      </p>
-
-      <p className="mt-1 text-xs uppercase tracking-wider text-slate-500">
-        {label}
-      </p>
-
-    </div>
-
-  );
-
-}
-
-/* ===============================
-   Score Progress Bar
-=============================== */
-
-function ScoreBar({
-  title,
-  score,
-}) {
-
-  return (
-
-    <div>
-
-      <div className="mb-2 flex items-center justify-between">
-
-        <span className="text-sm font-medium text-slate-300">
-          {title}
-        </span>
-
-        <span className="text-sm font-bold text-white">
-          {score}%
-        </span>
-
-      </div>
-
-      <div className="h-3 overflow-hidden rounded-full bg-slate-800">
-
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"
-          style={{
-            width: `${Math.min(score, 100)}%`,
-          }}
-        />
-
-      </div>
-
-    </div>
-
-  );
-
-}
 
 export default AiFreelancerCard;
