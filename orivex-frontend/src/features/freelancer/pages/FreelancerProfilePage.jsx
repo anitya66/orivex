@@ -75,7 +75,7 @@ function FreelancerProfilePage() {
 
   return (
 
-  <div className="space-y-8">
+  <div className="mx-auto w-full max-w-7xl space-y-8 overflow-x-hidden">
 
     {/* Hero */}
 
@@ -91,17 +91,17 @@ function FreelancerProfilePage() {
 
   {/* Content */}
 
-  <div className="relative px-10 pb-10">
+  <div className="relative px-5 pb-6 sm:px-8 lg:px-10 lg:pb-10">
 
-    <div className="-mt-14 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+    <div className="-mt-10 flex flex-col gap-6 lg:-mt-14 lg:flex-row lg:items-center lg:justify-between">
 
       {/* Left */}
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
+      <div className="flex flex-col items-center text-center gap-6 lg:flex-row lg:items-center lg:text-left">
 
         {/* Avatar */}
 
-        <div className="flex h-36 w-36 shrink-0 items-center justify-center overflow-hidden rounded-full border-[6px] border-slate-900 bg-slate-800 shadow-[0_0_40px_rgba(59,130,246,0.35)]">
+       <div className="flex h-24 w-24 sm:h-28 sm:w-28 lg:h-36 lg:w-36 shrink-0 items-center justify-center overflow-hidden rounded-full border-[6px] border-slate-900 bg-slate-800 shadow-[0_0_40px_rgba(59,130,246,0.35)]">
 
           {freelancer.profileImage ? (
 
@@ -116,7 +116,7 @@ function FreelancerProfilePage() {
 
           ) : (
 
-            <span className="text-6xl font-black text-white">
+            <span className="text-4xl lg:text-6xl font-black text-white">
               {freelancer.name.charAt(0)}
             </span>
 
@@ -126,17 +126,17 @@ function FreelancerProfilePage() {
 
         {/* Details */}
 
-        <div className="pt-8 lg:pt-12">
+        <div className="pt-2 lg:pt-12">
 
           
 
-          <h1 className="text-5xl font-black leading-tight text-white">
+          <h1 className="break-words text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
 
             {freelancer.name}
 
           </h1>
 
-          <p className="mt-2 text-2xl text-sky-300">
+          <p className="mt-2 text-lg text-sky-300 sm:text-xl lg:text-2xl">
 
             {freelancer.headline || "Professional Freelancer"}
 
@@ -163,7 +163,7 @@ function FreelancerProfilePage() {
 
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-4">
+          <div className="mt-6 flex flex-wrap justify-center gap-4 lg:justify-start">
 
             <div className="rounded-2xl border border-slate-700 bg-slate-800/60 px-5 py-3">
 

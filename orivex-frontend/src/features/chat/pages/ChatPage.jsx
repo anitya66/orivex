@@ -197,7 +197,7 @@ function ChatPage() {
         />
       )}
 
-      <div className="relative flex min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950">
+      <div className="relative flex h-full min-h-0 flex-1 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950">
 
         <button
           onClick={() =>
@@ -225,7 +225,7 @@ function ChatPage() {
             }
           `}
         >
-          <div className="border-b border-slate-800 p-6">
+          <div className="border-b border-slate-800 p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
 
@@ -283,7 +283,7 @@ function ChatPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
 
             <ConversationList
               conversations={
@@ -305,7 +305,7 @@ function ChatPage() {
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="min-h-0 flex min-w-0 flex-1 flex-col overflow-hidden">
 
           <ChatWindow
             conversation={

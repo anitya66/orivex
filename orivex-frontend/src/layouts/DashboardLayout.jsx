@@ -35,7 +35,7 @@ function DashboardContent() {
 
   return (
 
-    <div className="flex h-[100dvh] bg-slate-950">
+    <div className="flex h-[100dvh] overflow-hidden bg-slate-950">
 
       {/* Mobile Overlay */}
 
@@ -65,9 +65,9 @@ function DashboardContent() {
 
         {/* Content */}
 
-        <main className="flex flex-1 flex-col overflow-y-auto bg-slate-950">
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-950">
 
-          <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-1 flex-col px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
 
             <Outlet />
 
