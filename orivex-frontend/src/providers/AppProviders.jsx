@@ -10,7 +10,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LogoutModalProvider } from "@/contexts/LogoutModalContext";
 
-import { CallProvider } from "@/features/call/context/CallContext";
+
 
 import GlobalLogoutModal from "@/components/common/GlobalLogoutModal";
 
@@ -26,7 +26,7 @@ function AppProviders({ children }) {
 
           <LogoutModalProvider>
 
-            <CallProvider>
+           
 
               {children}
 
@@ -37,7 +37,7 @@ function AppProviders({ children }) {
                 position="top-right"
               />
 
-            </CallProvider>
+            
 
           </LogoutModalProvider>
 

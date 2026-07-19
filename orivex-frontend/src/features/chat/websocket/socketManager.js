@@ -10,6 +10,9 @@ const subscriptions = new Map();
 const pendingSubscriptions = new Map();
 const pendingPublishes = [];
 
+
+
+
 /* =========================================
    Internal
 ========================================= */
@@ -52,20 +55,19 @@ function internalSubscribe(destination, callback) {
   }
 
   const subscription = stompClient.subscribe(
-    destination,
-    (message) => {
+  destination,
+  (message) => {
 
-      console.log(
-        "MESSAGE RECEIVED FROM",
-        destination,
-        JSON.parse(message.body)
-      );
+    console.log("========== EVENT ==========");
+    console.log(destination);
+    console.log(message.body);
+    console.log("===========================");
 
-      callback(JSON.parse(message.body));
-    }
-  );
+    callback(JSON.parse(message.body));
+  }
+);
 
-  subscriptions.set(destination, subscription);
+console.log("SUBSCRIBED SUCCESS:", destination);
 
 }
 
@@ -74,6 +76,9 @@ function internalSubscribe(destination, callback) {
 ========================================= */
 
 export function connectSocket(onConnected) {
+  
+ 
+  
   if (stompClient?.connected) {
     onConnected?.();
     return;
@@ -142,13 +147,12 @@ export function connectSocket(onConnected) {
 ========================================= */
 
 export function disconnectSocket() {
+
+  console.trace("disconnectSocket CALLED");
+
   subscriptions.forEach((subscription) =>
     subscription.unsubscribe()
   );
-
-  subscriptions.clear();
-
-  pendingSubscriptions.clear();
 
   pendingPublishes.length = 0;
 
@@ -198,19 +202,46 @@ export function unsubscribe(destination) {
 ========================================= */
 
 export function publish(destination, body) {
-  if (!stompClient?.connected) {
-    pendingPublishes.push({
-      destination,
-      body,
-    });
 
+  
+  
+  console.log("WINDOW PATH =", window.location.pathname);
+  
+  
+  console.trace("publish called");
+  console.log("==============");
+  console.log("PUBLISH");
+  console.log(destination);
+  console.log(body);
+  console.log("CLIENT =", stompClient);
+  console.log("CONNECTED =", stompClient?.connected);
+
+  if (!stompClient) {
+    console.log("NO CLIENT");
     return;
   }
 
-  stompClient.publish({
-    destination,
-    body: JSON.stringify(body),
-  });
+  if (!stompClient.connected) {
+    console.log("NOT CONNECTED");
+    return;
+  }
+
+  try {
+
+    stompClient.publish({
+      destination,
+      body: JSON.stringify(body),
+    });
+
+    console.log("PUBLISH SUCCESS");
+
+  } catch (e) {
+
+    console.error("PUBLISH FAILED", e);
+
+  }
+
+  console.log("==============");
 }
 
 /* =========================================

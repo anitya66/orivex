@@ -40,8 +40,6 @@ import AdminProjectsPage from "@/features/admin/pages/AdminProjectsPage";
 import AdminContractsPage from "@/features/admin/pages/AdminContractsPage";
 import AdminAnalyticsPage from "@/features/admin/pages/AdminAnalyticsPage";
 
-import CallPage from "@/features/call/pages/CallPage";
-
 import NotFoundPage from "@/features/not-found/pages/NotFoundPage";
 
 export default function AppRouter() {
@@ -70,17 +68,6 @@ export default function AppRouter() {
           element={<RegisterPage />}
         />
       </Route>
-
-      {/* ================= CALL ================= */}
-
-      <Route
-        path="/call"
-        element={
-          <ProtectedRoute>
-            <CallPage />
-          </ProtectedRoute>
-        }
-      />
 
       {/* ================= DASHBOARD ================= */}
 

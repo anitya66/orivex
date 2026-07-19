@@ -1,18 +1,12 @@
 import { useEffect, useRef } from "react";
+
+
 import {
   Circle,
-  Phone,
-  Video,
   MoreVertical,
   ArrowLeft,
 } from "lucide-react";
 
-import { useAuth } from "@/contexts/AuthContext";
-
-import {
-  startAudioCall,
-  startVideoCall,
-} from "@/features/call/websocket/callSocket";
 
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
@@ -28,7 +22,7 @@ function ChatWindow({
 }) {
   const bottomRef = useRef(null);
 
-  const { user } = useAuth();
+  
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -56,20 +50,10 @@ function ChatWindow({
     );
   }
 
-  function handleAudioCall() {
-
-  startAudioCall(conversation, user);
-
-}
-
-  function handleVideoCall() {
-
-  startVideoCall(conversation, user);
-
-}
+ 
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-1 flex-col">
 
       {/* ================= HEADER ================= */}
 
@@ -128,39 +112,18 @@ function ChatWindow({
 
         <div className="flex items-center gap-2 sm:gap-3">
 
-          {/* AUDIO */}
+  <button
+    className="rounded-xl border border-slate-700 bg-slate-800 p-3 text-slate-300 transition hover:border-slate-500 hover:text-white"
+  >
+    <MoreVertical size={18} />
+  </button>
 
-          <button
-            onClick={handleAudioCall}
-            className="rounded-xl border border-slate-700 bg-slate-800 p-3 text-slate-300 transition hover:border-green-500 hover:bg-green-500/10 hover:text-green-400"
-          >
-            <Phone size={18} />
-          </button>
-
-          {/* VIDEO */}
-
-          <button
-            onClick={handleVideoCall}
-            className="rounded-xl border border-slate-700 bg-slate-800 p-3 text-slate-300 transition hover:border-blue-500 hover:bg-blue-500/10 hover:text-blue-400"
-          >
-            <Video size={18} />
-          </button>
-
-          {/* MORE */}
-
-          <button
-            className="rounded-xl border border-slate-700 bg-slate-800 p-3 text-slate-300 transition hover:border-slate-500 hover:text-white"
-          >
-            <MoreVertical size={18} />
-          </button>
-
-        </div>
-
+</div>
       </div>
 
       {/* ================= MESSAGES ================= */}
 
-      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6">
+      <div className=" min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6">
 
         {loadingMessages ? (
 
@@ -186,7 +149,7 @@ function ChatWindow({
 
       {/* ================= INPUT ================= */}
 
-       <div className="sticky bottom-0 border-t border-slate-800 bg-slate-900">
+       <div className="shrink-0 border-t border-slate-800 bg-slate-900">
 
         <MessageInput
           onSend={onSend}

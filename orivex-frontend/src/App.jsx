@@ -1,10 +1,18 @@
-import AppRouter from "@/routes/AppRouter";
 import { Toaster } from "sonner";
 
-function App() {
+import AppRouter from "@/routes/AppRouter";
+
+
+
+function AppContent() {
+  
+
   return (
     <>
       <AppRouter />
+
+      
+
       <Toaster
         position="top-right"
         richColors
@@ -14,4 +22,6 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return <AppContent />;
+}
