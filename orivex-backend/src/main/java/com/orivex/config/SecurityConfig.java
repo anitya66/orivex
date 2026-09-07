@@ -1,27 +1,29 @@
 package com.orivex.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import java.util.List;
 
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import com.orivex.security.CustomUserDetailsService;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.orivex.security.CustomUserDetailsService;
 import com.orivex.security.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -35,63 +37,98 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
 
+    // ============================================================
+    // PASSWORD ENCODER
+    // ============================================================
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // ============================================================
+    // SECURITY FILTER CHAIN
+    // ============================================================
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
 
-           http
+        http
+                // Explicitly use our CORS configuration
+                .cors(cors ->
+                        cors.configurationSource(corsConfigurationSource())
+                )
 
-                .cors(Customizer.withDefaults())
-
+                // Disable CSRF because we are using JWT/stateless authentication
                 .csrf(csrf -> csrf.disable())
 
-                            .authorizeHttpRequests(auth -> auth
+                // Authorization rules
+                .authorizeHttpRequests(auth -> auth
 
-                                           .requestMatchers(
-                                                           "/api/v1/auth/login",
-                                                           "/api/v1/auth/register",
-                                                           "/swagger-ui/**",
-                                                           "/swagger-ui.html",
-                                                           "/v3/api-docs/**",
-                                                           "/ws/**",
-                                                           "/api/v1/files/**")
-                                           .permitAll()
+                        // Allow browser CORS preflight requests
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.OPTIONS,
+                                "/**"
+                        ).permitAll()
 
-                            .anyRequest()
-                            .authenticated()
+                        // Public endpoints
+                        .requestMatchers(
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/register",
 
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
 
-                            )
+                                "/ws/**",
 
-                            .sessionManagement(session -> session
-                                            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                "/api/v1/files/**"
+                        ).permitAll()
 
-                            .authenticationProvider(authenticationProvider())
+                        // Everything else requires authentication
+                        .anyRequest().authenticated()
+                )
 
-                            .addFilterBefore(
-                                            jwtAuthenticationFilter,
-                                            UsernamePasswordAuthenticationFilter.class);
+                // JWT = stateless authentication
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
 
-            return http.build();
+                // Authentication provider
+                .authenticationProvider(authenticationProvider())
+
+                // JWT filter runs before Spring's username/password filter
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
+        return http.build();
     }
+
+    // ============================================================
+    // AUTHENTICATION PROVIDER
+    // ============================================================
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
 
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider();
 
         provider.setUserDetailsService(customUserDetailsService);
 
         provider.setPasswordEncoder(passwordEncoder());
 
         return provider;
-
     }
+
+    // ============================================================
+    // AUTHENTICATION MANAGER
+    // ============================================================
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -99,45 +136,55 @@ public class SecurityConfig {
             throws Exception {
 
         return configuration.getAuthenticationManager();
-
     }
 
+    // ============================================================
+    // CORS CONFIGURATION
+    // ============================================================
+
     @Bean
-public CorsConfigurationSource corsConfigurationSource() {
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
 
-    CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration configuration =
+                new CorsConfiguration();
 
-    configuration.setAllowedOrigins(
-            List.of(
-                    "http://localhost:5173",
-                    "https://orivex-i1qp.vercel.app"
-            )
-    );
+        // Frontend origins allowed to call the backend
+        configuration.setAllowedOrigins(
+                List.of(
+                        "http://localhost:5173",
+                        "https://orivex-i1qp.vercel.app"
+                )
+        );
 
-    configuration.setAllowedMethods(
-            List.of(
-                    "GET",
-                    "POST",
-                    "PUT",
-                    "DELETE",
-                    "PATCH",
-                    "OPTIONS"
-            )
-    );
+        // HTTP methods allowed
+        configuration.setAllowedMethods(
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "PATCH",
+                        "OPTIONS"
+                )
+        );
 
-    configuration.setAllowedHeaders(
-            List.of("*")
-    );
+        // Allow all request headers
+        configuration.setAllowedHeaders(
+                List.of("*")
+        );
 
-    configuration.setAllowCredentials(true);
+        // Required if frontend sends credentials/cookies
+        configuration.setAllowCredentials(true);
 
-    UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
+        // Register CORS configuration for every endpoint
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
 
-    source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
 
-    return source;
-}
-
-
+        return source;
+    }
 }
