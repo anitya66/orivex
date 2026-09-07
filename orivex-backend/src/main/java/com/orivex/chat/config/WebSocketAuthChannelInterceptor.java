@@ -8,7 +8,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,18 +33,21 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
         System.out.println("==================================");
         System.out.println("COMMAND : " + accessor.getCommand());
-        
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 
             System.out.println("CONNECT RECEIVED");
-
             System.out.println("HEADERS : " + accessor.toNativeHeaderMap());
 
-            String authHeader = accessor.getFirstNativeHeader("Authorization");
+            String authHeader =
+                    accessor.getFirstNativeHeader("Authorization");
 
-            if (authHeader == null && accessor.getSessionAttributes() != null) {
-                Object sessionAuthHeader = accessor.getSessionAttributes().get("Authorization");
+            if (authHeader == null &&
+                    accessor.getSessionAttributes() != null) {
+
+                Object sessionAuthHeader =
+                        accessor.getSessionAttributes().get("Authorization");
+
                 if (sessionAuthHeader instanceof String sessionToken) {
                     authHeader = sessionToken;
                 }
@@ -59,37 +62,59 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
 
                     String jwt = authHeader.substring(7);
 
-                    String email = jwtService.extractUsername(jwt);
+                    String email =
+                            jwtService.extractUsername(jwt);
 
                     System.out.println("EMAIL : " + email);
 
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                    UserDetails userDetails =
+                            userDetailsService.loadUserByUsername(email);
 
                     if (jwtService.isTokenValid(jwt, userDetails)) {
 
-                        String username = userDetails.getUsername();
+                        String username =
+                                userDetails.getUsername();
 
-                        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                userDetails.getAuthorities());
+                        Authentication authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        username,
+                                        null,
+                                        userDetails.getAuthorities()
+                                );
 
                         accessor.setUser(authentication);
-                        accessor.setHeader(SimpMessageHeaderAccessor.USER_HEADER, authentication);
-                        
+
+                        accessor.setHeader(
+                                SimpMessageHeaderAccessor.USER_HEADER,
+                                authentication
+                        );
+
                         System.out.println("==================================");
-                        System.out.println("PRINCIPAL OBJECT = " + accessor.getUser());
-                        System.out.println("PRINCIPAL NAME   = " + accessor.getUser().getName());
-                        System.out.println("AUTH NAME        = " + authentication.getName());
+                        System.out.println(
+                                "PRINCIPAL OBJECT = "
+                                        + accessor.getUser()
+                        );
+
+                        System.out.println(
+                                "PRINCIPAL NAME = "
+                                        + accessor.getUser().getName()
+                        );
+
+                        System.out.println(
+                                "AUTH NAME = "
+                                        + authentication.getName()
+                        );
+
                         System.out.println("==================================");
 
-                        System.out.println("USER SET : "
-                                + authentication.getName());
+                        System.out.println(
+                                "USER SET : "
+                                        + authentication.getName()
+                        );
 
                     } else {
 
                         System.out.println("JWT INVALID");
-
                     }
 
                 } catch (Exception e) {
@@ -103,11 +128,18 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
             } else {
 
                 System.out.println("NO AUTH HEADER");
-
             }
-
         }
 
-        return message;
+        /*
+         * IMPORTANT:
+         * We modified the STOMP accessor above.
+         * Therefore we must return a Message created
+         * from the modified accessor headers.
+         */
+        return MessageBuilder.createMessage(
+                message.getPayload(),
+                accessor.getMessageHeaders()
+        );
     }
 }

@@ -7,6 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.orivex.common.response.ApiResponse;
 import com.orivex.project.dto.ProjectResponse;
 import com.orivex.project.service.ProjectService;
+import com.orivex.proposal.service.ProposalService;
+import com.orivex.security.CustomUserDetailsService;
+import com.orivex.security.JwtService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,15 @@ class ProjectControllerTest {
     @MockBean
     private ProjectService projectService;
 
+    @MockBean
+    private ProposalService proposalService;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
+
     @Test
     void getProjectById_ShouldReturn200() throws Exception {
 
@@ -33,15 +45,16 @@ class ProjectControllerTest {
                 .title("Netflix Backend")
                 .build();
 
-        ApiResponse<ProjectResponse> apiResponse = ApiResponse.success(response,
-                "Project fetched successfully.");
+        ApiResponse<ProjectResponse> apiResponse =
+                ApiResponse.success(
+                        response,
+                        "Project fetched successfully."
+                );
 
         when(projectService.getProjectById(1L))
                 .thenReturn(apiResponse);
 
         mockMvc.perform(get("/api/v1/projects/1"))
                 .andExpect(status().isOk());
-
     }
-
 }

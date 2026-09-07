@@ -3,24 +3,23 @@ package com.orivex.project.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-
-import com.orivex.common.exception.BadRequestException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.orivex.activity.service.ActivityService;
+import com.orivex.common.exception.BadRequestException;
 import com.orivex.common.response.ApiResponse;
 import com.orivex.project.dto.CreateProjectRequest;
 import com.orivex.project.dto.ProjectResponse;
@@ -46,6 +45,9 @@ class ProjectServiceImplTest {
 
     @Mock
     private ClientProfileRepository clientProfileRepository;
+
+    @Mock
+    private ActivityService activityService;
 
     @InjectMocks
     private ProjectServiceImpl projectService;
@@ -91,7 +93,8 @@ class ProjectServiceImplTest {
         // Act
         // =========================
 
-        ApiResponse<ProjectResponse> result = projectService.createProject(request);
+        ApiResponse<ProjectResponse> result =
+                projectService.createProject(request);
 
         // =========================
         // Assert
@@ -101,54 +104,74 @@ class ProjectServiceImplTest {
 
         assertEquals(
                 "Project created successfully.",
-                result.getMessage());
+                result.getMessage()
+        );
 
         assertEquals(
                 response,
-                result.getData());
+                result.getData()
+        );
 
-        verify(authenticationFacade).getCurrentUser();
+        verify(authenticationFacade)
+                .getCurrentUser();
 
-        verify(clientProfileRepository).findByUser(user);
+        verify(clientProfileRepository)
+                .findByUser(user);
 
-        verify(projectMapper).toEntity(request);
+        verify(projectMapper)
+                .toEntity(request);
 
-        verify(projectRepository).save(project);
+        verify(projectRepository)
+                .save(project);
 
-        verify(projectMapper).toResponse(project);
-
+        verify(projectMapper)
+                .toResponse(project);
     }
 
     @Test
-void createProject_ShouldThrowException_WhenClientProfileNotFound() {
+    void createProject_ShouldThrowException_WhenClientProfileNotFound() {
 
-    // Arrange
-    CreateProjectRequest request = new CreateProjectRequest();
-    request.setTitle("Netflix Backend");
+        // =========================
+        // Arrange
+        // =========================
 
-    User user = new User();
-    user.setEmail("client@gmail.com");
+        CreateProjectRequest request =
+                new CreateProjectRequest();
 
-    when(authenticationFacade.getCurrentUser())
-            .thenReturn(user);
+        request.setTitle("Netflix Backend");
 
-    when(clientProfileRepository.findByUser(user))
-            .thenReturn(Optional.empty());
+        User user = new User();
 
-    // Act + Assert
-    BadRequestException exception = assertThrows(
-            BadRequestException.class,
-            () -> projectService.createProject(request)
-    );
+        user.setEmail("client@gmail.com");
 
-    assertEquals(
-            "Client profile not found.",
-            exception.getMessage());
+        when(authenticationFacade.getCurrentUser())
+                .thenReturn(user);
 
-    verify(authenticationFacade).getCurrentUser();
-    verify(clientProfileRepository).findByUser(user);
+        when(clientProfileRepository.findByUser(user))
+                .thenReturn(Optional.empty());
 
-    verify(projectRepository, never()).save(any());
-}
+        // =========================
+        // Act + Assert
+        // =========================
 
+        BadRequestException exception =
+                assertThrows(
+                        BadRequestException.class,
+                        () -> projectService.createProject(request)
+                );
+
+        assertEquals(
+                "Client profile not found.",
+                exception.getMessage()
+        );
+
+        verify(authenticationFacade)
+                .getCurrentUser();
+
+        verify(clientProfileRepository)
+                .findByUser(user);
+
+        verify(projectRepository, never())
+                .save(any());
+    }
 }
