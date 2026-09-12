@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "https://orivex-backend-tp0t.onrender.com/api/v1/:path*"
+      "destination": "https://orivex-backend-tpt0.onrender.com/api/v1/:path*"
     },
     {
       "source": "/(.*)",
