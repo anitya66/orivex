@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+
 import { useSearchParams } from "react-router-dom";
+
 import {
   subscribeConversation,
   unsubscribe,
@@ -20,6 +22,10 @@ import { useConversations } from "../hooks/useConversations";
 import { useMessages } from "../hooks/useMessages";
 import { useSendMessage } from "../hooks/useSendMessage";
 
+// Stable empty array.
+// IMPORTANT: Do not create [] inside the component/default parameter.
+const EMPTY_MESSAGES = [];
+
 function ChatPage() {
   const { user } = useAuth();
 
@@ -32,8 +38,11 @@ function ChatPage() {
 
   const [search, setSearch] = useState("");
 
-  const [sidebarOpen, setSidebarOpen] =
-    useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // =========================================================
+  // CONVERSATIONS
+  // =========================================================
 
   const {
     data,
@@ -43,8 +52,16 @@ function ChatPage() {
 
   const conversations = data ?? [];
 
+  // =========================================================
+  // SELECT CONVERSATION
+  // =========================================================
+
   useEffect(() => {
     if (!conversations.length) return;
+
+    // ---------------------------------------------------------
+    // 1. Conversation from URL
+    // ---------------------------------------------------------
 
     if (conversationId) {
       const conversation = conversations.find(
@@ -52,30 +69,48 @@ function ChatPage() {
       );
 
       if (conversation) {
-        setSelectedConversation(conversation);
+        setSelectedConversation((previous) => {
+          // Prevent unnecessary state update
+          if (previous?.id === conversation.id) {
+            return previous;
+          }
+
+          return conversation;
+        });
+
         return;
       }
     }
 
-    const savedConversationId =
-      localStorage.getItem(
-        "selectedConversationId"
-      );
+    // ---------------------------------------------------------
+    // 2. Conversation saved in localStorage
+    // ---------------------------------------------------------
+
+    const savedConversationId = localStorage.getItem(
+      "selectedConversationId"
+    );
 
     if (!savedConversationId) return;
 
     const conversation = conversations.find(
-      (c) =>
-        c.id === Number(savedConversationId)
+      (c) => c.id === Number(savedConversationId)
     );
 
     if (conversation) {
-      setSelectedConversation(conversation);
+      setSelectedConversation((previous) => {
+        // Prevent unnecessary state update
+        if (previous?.id === conversation.id) {
+          return previous;
+        }
+
+        return conversation;
+      });
     }
-  }, [
-    conversations,
-    conversationId,
-  ]);
+  }, [conversations, conversationId]);
+
+  // =========================================================
+  // SAVE SELECTED CONVERSATION
+  // =========================================================
 
   useEffect(() => {
     if (!selectedConversation) return;
@@ -88,17 +123,33 @@ function ChatPage() {
     setSidebarOpen(false);
   }, [selectedConversation]);
 
+  // =========================================================
+  // MESSAGES
+  // =========================================================
+
   const {
-    data: fetchedMessages = [],
+    data: fetchedMessages,
     isLoading: loadingMessages,
   } = useMessages(selectedConversation?.id);
 
+  // Use a stable empty array when React Query has no data yet.
+  const safeFetchedMessages =
+    fetchedMessages ?? EMPTY_MESSAGES;
+
   const [messages, setMessages] = useState([]);
+
+  // =========================================================
+  // SEND MESSAGE
+  // =========================================================
 
   const {
     mutate: sendMessage,
     isPending,
   } = useSendMessage();
+
+  // =========================================================
+  // LOAD FETCHED MESSAGES
+  // =========================================================
 
   useEffect(() => {
     if (!selectedConversation) {
@@ -106,11 +157,15 @@ function ChatPage() {
       return;
     }
 
-    setMessages(fetchedMessages);
+    setMessages(safeFetchedMessages);
   }, [
     selectedConversation?.id,
-    fetchedMessages,
+    safeFetchedMessages,
   ]);
+
+  // =========================================================
+  // WEBSOCKET SUBSCRIPTION
+  // =========================================================
 
   useEffect(() => {
     if (!selectedConversation) return;
@@ -121,17 +176,19 @@ function ChatPage() {
     subscribeConversation(
       selectedConversation.id,
       (newMessage) => {
-        setMessages((prev) => {
+        setMessages((previousMessages) => {
+          // Prevent duplicate messages
           if (
-            prev.some(
-              (m) => m.id === newMessage.id
+            previousMessages.some(
+              (message) =>
+                message.id === newMessage.id
             )
           ) {
-            return prev;
+            return previousMessages;
           }
 
           return [
-            ...prev,
+            ...previousMessages,
             newMessage,
           ];
         });
@@ -143,15 +200,22 @@ function ChatPage() {
     };
   }, [selectedConversation?.id]);
 
+  // =========================================================
+  // SEND MESSAGE
+  // =========================================================
+
   function handleSend(message) {
     if (!selectedConversation) return;
 
     sendMessage({
-      conversationId:
-        selectedConversation.id,
+      conversationId: selectedConversation.id,
       message,
     });
   }
+
+  // =========================================================
+  // LOADING
+  // =========================================================
 
   if (isLoading) {
     return (
@@ -161,6 +225,10 @@ function ChatPage() {
     );
   }
 
+  // =========================================================
+  // ERROR
+  // =========================================================
+
   if (isError) {
     return (
       <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-10 text-center text-red-400">
@@ -169,44 +237,49 @@ function ChatPage() {
     );
   }
 
-  const filteredConversations =
-    conversations.filter(
-      (conversation) => {
-        const keyword =
-          search.toLowerCase();
+  // =========================================================
+  // SEARCH / FILTER
+  // =========================================================
 
-        return (
-          conversation.otherUserName
-            ?.toLowerCase()
-            .includes(keyword) ||
-          conversation.projectTitle
-            ?.toLowerCase()
-            .includes(keyword)
-        );
-      }
-    );
+  const filteredConversations =
+    conversations.filter((conversation) => {
+      const keyword = search.toLowerCase();
+
+      return (
+        conversation.otherUserName
+          ?.toLowerCase()
+          .includes(keyword) ||
+        conversation.projectTitle
+          ?.toLowerCase()
+          .includes(keyword)
+      );
+    });
+
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <>
       {sidebarOpen && (
         <div
-          onClick={() =>
-            setSidebarOpen(false)
-          }
+          onClick={() => setSidebarOpen(false)}
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
         />
       )}
 
       <div className="relative flex h-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-950">
 
+        {/* MOBILE MENU BUTTON */}
+
         <button
-          onClick={() =>
-            setSidebarOpen(true)
-          }
+          onClick={() => setSidebarOpen(true)}
           className="absolute left-4 top-4 z-30 rounded-xl border border-slate-700 bg-slate-900 p-2 text-white lg:hidden"
         >
           <Menu size={20} />
         </button>
+
+        {/* SIDEBAR */}
 
         <aside
           className={`
@@ -225,8 +298,13 @@ function ChatPage() {
             }
           `}
         >
+
+          {/* SIDEBAR HEADER */}
+
           <div className="border-b border-slate-800 p-4 sm:p-6">
+
             <div className="flex items-center justify-between">
+
               <div className="flex items-center gap-3">
 
                 <div className="rounded-2xl bg-blue-500/10 p-3">
@@ -237,30 +315,32 @@ function ChatPage() {
                 </div>
 
                 <div>
+
                   <h1 className="text-2xl font-black text-white">
                     Messages
                   </h1>
 
                   <p className="text-sm text-slate-400">
-                    {
-                      filteredConversations.length
-                    }{" "}
+                    {filteredConversations.length}{" "}
                     Conversations
                   </p>
+
                 </div>
 
               </div>
 
+              {/* MOBILE CLOSE */}
+
               <button
-                onClick={() =>
-                  setSidebarOpen(false)
-                }
+                onClick={() => setSidebarOpen(false)}
                 className="rounded-xl border border-slate-700 p-2 text-white lg:hidden"
               >
                 <X size={18} />
               </button>
 
             </div>
+
+            {/* SEARCH */}
 
             <div className="relative mt-6">
 
@@ -272,50 +352,47 @@ function ChatPage() {
               <input
                 value={search}
                 onChange={(e) =>
-                  setSearch(
-                    e.target.value
-                  )
+                  setSearch(e.target.value)
                 }
                 placeholder="Search conversation..."
                 className="w-full rounded-2xl border border-slate-700 bg-slate-900 py-3 pl-11 pr-4 text-white outline-none focus:border-blue-500"
               />
 
             </div>
+
           </div>
+
+          {/* CONVERSATION LIST */}
 
           <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
 
             <ConversationList
-              conversations={
-                filteredConversations
-              }
+              conversations={filteredConversations}
               selectedConversation={
                 selectedConversation
               }
-              onSelect={(
-                conversation
-              ) => {
+              onSelect={(conversation) => {
                 setSelectedConversation(
                   conversation
                 );
+
                 setSidebarOpen(false);
               }}
             />
 
           </div>
+
         </aside>
 
-      <div className="min-h-0 flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* CHAT AREA */}
+
+        <div className="min-h-0 flex min-w-0 flex-1 flex-col overflow-hidden">
 
           <ChatWindow
-            conversation={
-              selectedConversation
-            }
+            conversation={selectedConversation}
             messages={messages}
             currentUserId={user.id}
-            loadingMessages={
-              loadingMessages
-            }
+            loadingMessages={loadingMessages}
             onSend={handleSend}
             sending={isPending}
             onOpenSidebar={() =>
